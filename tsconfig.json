@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "amd",
+    "sourceMap": true,
+    "rootDir": "",
+    "outDir": "",
+    "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "typeRoots" : ["../node_modules/@types", "./node_modules/@types"]
+  },
+  "exclude" : ["node_modules"]
+}
