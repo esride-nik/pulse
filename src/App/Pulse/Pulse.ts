@@ -24,7 +24,7 @@ export class Pulse {
     private updateField = false //check for attribute change
     private intervalFunc: any; //animation interval name
     private overRidingField: any; //casts url field as no.1 selection in attribute selector
-    private view: MapView;
+    private mapView: MapView;
     private map: Map;
     private featureLayer: FeatureLayer;
     private select: HTMLElement | null;
@@ -34,22 +34,14 @@ export class Pulse {
     private newSymbol: Symbol;
     private newType: any;
 
-    public constructor() {
-        console.log("PULSE");
+    public constructor(map: Map, mapView: MapView) {
+        console.log("PULSE", map, mapView);
+        this.map = map;
+        this.mapView = mapView;
         this.initalise();
     }
 
     private initalise(){
-        this.map = new Map({
-            basemap: "dark-gray-vector"
-        });
-        
-        this.view = new MapView({
-            container: "viewDiv",
-            map: this.map,
-            zoom: 3,
-            center: [0, 0]
-        });
 
         //event listeners
         this.addEventListenerToDocumentElementValueById("play", "click", this.play);
@@ -71,7 +63,7 @@ export class Pulse {
         //     defaultService()
         // }
 
-        this.view.when(function() {
+        this.mapView.when(function() {
             // watchUtils.when(this.view, "stationary", updateMapLongLatt)
             
             // var pt = new Point({
@@ -83,6 +75,7 @@ export class Pulse {
             //     target: pt,
             //     zoom: mapLongLattZoom[2]
             // })
+            console.log("view init");
         })
         //once feature layer url has been set, now add it to the map.
         // addFeatureLayer()

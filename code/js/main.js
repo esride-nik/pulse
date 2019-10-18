@@ -1,6 +1,7 @@
-define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "axios"], function (require, exports, Map, MapView, FeatureLayer, axios_1) {
+define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer"], function (require, exports, Map, MapView, FeatureLayer) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // import axios from 'axios';
     var Pulse = /** @class */ (function () {
         function Pulse() {
             // function(Map, MapView, FeatureLayer, VectorTileLayer, SimpleLineSymbol, watchUtils, webMercatorUtils, Point, dom) {
@@ -13,6 +14,7 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
             this.initalise();
         }
         Pulse.prototype.initalise = function () {
+            var _this = this;
             this.map = new Map({
                 basemap: "dark-gray-vector"
             });
@@ -25,7 +27,7 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
             //event listeners
             this.addEventListenerToDocumentElementValueById("play", "click", this.play);
             this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
-            this.addEventListenerToDocumentElementValueById("fs-url", "change", this.addFeatureLayer);
+            this.addEventListenerToDocumentElementValueById("fs-url", "change", function (evt) { return _this.addFeatureLayer; });
             // //check URL for paramaters, if there's some. Add it in.
             // var browserURL = window.location.search
             // if (browserURL != "") {
@@ -84,8 +86,9 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         //     updateBrowserURL()
         // }
         //adds the feature layer to the map.
-        Pulse.prototype.addFeatureLayer = function () {
-            var flURL = this.getDocumentElementValueById("fs-url");
+        Pulse.prototype.addFeatureLayer = function (evt) {
+            var flURL = document.getElementById("fs-url");
+            // var flURL = this.getDocumentElementValueById("fs-url");
             if (flURL != "") {
                 this.featureLayer = new FeatureLayer({
                     url: flURL
@@ -106,40 +109,41 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         };
         //populating selection drop down based on featurelayer.
         Pulse.prototype.getFields = function (flURL) {
-            axios_1.default.get({
-                url: flURL + "?f=json",
-                type: "GET"
-            }).then(function (FLfields) {
-                var fieldsObj = JSON.parse(FLfields);
-                this.getDocumentElementValueById("feature-layer-name").innerHTML = fieldsObj.name;
-                this.updateExtent(fieldsObj.extent);
-                this.select = this.getDocumentElementValueById('selection');
-                if (this.select) {
-                    this.select.innerHTML = '';
-                }
-                this.geometryType = fieldsObj.geometryType;
-                this.symbolSwitcher(this.geometryType);
-                for (var i = 0; i < fieldsObj.fields.length; i++) {
-                    if (fieldsObj.fields[i].sqlType != "sqlTypeNVarchar") {
-                        var opt = document.createElement('option');
-                        opt = fieldsObj.fields[i].name;
-                        opt.innerHTML = fieldsObj.fields[i].name;
-                        if (i === 0 && this.updateField === true) {
-                            opt = this.overRidingField;
-                            opt.innerHTML = this.overRidingField;
-                        }
-                        if (this.updateField === true && fieldsObj.fields[i].name === this.overRidingField) {
-                            opt = fieldsObj.fields[0].name;
-                            opt.innerHTML = fieldsObj.fields[0].name;
-                            this.updateField = false;
-                        }
-                        if (this.select) {
-                            this.select.appendChild(opt);
-                        }
-                    }
-                }
-                this.updateBrowserURL();
-            });
+            console.log("REST call 1");
+            // axios.get({
+            //     url: flURL + "?f=json",
+            //     type: "GET"
+            // }).then(function(FLfields: any) {
+            //     var fieldsObj = JSON.parse(FLfields)
+            //     this.getDocumentElementValueById("feature-layer-name").innerHTML = fieldsObj.name
+            //     this.updateExtent(fieldsObj.extent)
+            //     this.select = this.getDocumentElementValueById('selection')
+            //     if (this.select) {
+            //         this.select.innerHTML = ''
+            //     }
+            //     this.geometryType = fieldsObj.geometryType
+            //     this.symbolSwitcher(this.geometryType)
+            //     for (let i = 0; i < fieldsObj.fields.length; i++) {
+            //         if (fieldsObj.fields[i].sqlType != "sqlTypeNVarchar") {
+            //             var opt = document.createElement('option')
+            //             opt = fieldsObj.fields[i].name
+            //             opt.innerHTML = fieldsObj.fields[i].name
+            //             if (i === 0 && this.updateField === true) {
+            //                 opt = this.overRidingField
+            //                 opt.innerHTML = this.overRidingField
+            //             }
+            //             if (this.updateField === true && fieldsObj.fields[i].name === this.overRidingField) {
+            //                 opt = fieldsObj.fields[0].name
+            //                 opt.innerHTML = fieldsObj.fields[0].name
+            //                 this.updateField = false
+            //             }
+            //             if (this.select) {
+            //                 this.select.appendChild(opt)
+            //             }
+            //         }
+            //     }
+            //     this.updateBrowserURL();
+            // });
         };
         // private updateExtent(newExtent: Extent) {
         //     if (newExtent.spatialReference.wkid === 102100) {
@@ -176,30 +180,32 @@ define(["require", "exports", "esri/Map", "esri/views/MapView", "esri/layers/Fea
         Pulse.prototype.getMaxMin = function () {
             var flURL = this.getDocumentElementValueById("fs-url");
             var field = this.getDocumentElementValueById("selection");
-            axios_1.default.get({
-                url: flURL + "/query",
-                type: "GET",
-                data: {
-                    'f': 'pjson',
-                    'outStatistics': '[{"statisticType":"min","onStatisticField":"' + field +
-                        '", "outStatisticFieldName":"MinID"},{"statisticType":"max","onStatisticField":"' +
-                        field + '", "outStatisticFieldName":"MaxID"}]'
-                }
-            }).then(function (data) {
-                var dataJSONObj = JSON.parse(data);
-                this.fieldToAnimate = field;
-                this.startNumber(dataJSONObj.features[0].attributes.MinID);
-                this.endNo = dataJSONObj.features[0].attributes.MaxID;
-                //generate step number here too
-                var difference = Math.abs(dataJSONObj.features[0].attributes.MinID - dataJSONObj.features[0].attributes.MaxID);
-                var differencePerSecond = difference / this.getDocumentElementValueById("animation-time");
-                this.stepNumber = differencePerSecond / this.setIntervalSpeed;
-                this.startNo = dataJSONObj.features[0].attributes.MinID;
-                this.animate(dataJSONObj.features[0].attributes.MinID);
-                //adding empty frames at the start and end for fade in/out
-                this.endNo += this.stepNumber * 40;
-                this.startNo -= this.stepNumber * 2;
-            });
+            console.log("REST call 2");
+            //         axios.get({
+            //             url: flURL + "/query",
+            //             type: "GET",
+            //             data: {
+            //                 'f': 'pjson',
+            //                 'outStatistics': '[{"statisticType":"min","onStatisticField":"' + field +
+            //                     '", "outStatisticFieldName":"MinID"},{"statisticType":"max","onStatisticField":"' +
+            //                     field + '", "outStatisticFieldName":"MaxID"}]'
+            //             }
+            //         }).then(function(data: string) {
+            //             var dataJSONObj = JSON.parse(data)
+            // ;
+            //             this.fieldToAnimate = field;
+            //             this.startNumber(dataJSONObj.features[0].attributes.MinID);
+            //             this.endNo = dataJSONObj.features[0].attributes.MaxID;
+            //             //generate step number here too
+            //             var difference = Math.abs(dataJSONObj.features[0].attributes.MinID - dataJSONObj.features[0].attributes.MaxID);
+            //             var differencePerSecond = difference / this.getDocumentElementValueById("animation-time");
+            //             this.stepNumber = differencePerSecond / this.setIntervalSpeed;
+            //             this.startNo = dataJSONObj.features[0].attributes.MinID;
+            //             this.animate(dataJSONObj.features[0].attributes.MinID);
+            //             //adding empty frames at the start and end for fade in/out
+            //             this.endNo += this.stepNumber * 40;
+            //             this.startNo -= this.stepNumber * 2;
+            //         });
         };
         Pulse.prototype.stopAnimation = function () {
             ;

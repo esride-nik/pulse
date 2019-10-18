@@ -9,10 +9,16 @@
             has: {
                "esri-featurelayer-webgl": 1
             },
-            packages : [{
-               name : "app",
-               location : location.pathname.replace(/[^\/]+$/, '') + "./js"
-            }]
+            packages : [
+               {
+                  name : "app",
+                  location : location.pathname.replace(/[^\/]+$/, '') + "./js"
+               }
+               // ,{
+               //    name : "axios",
+               //    location : location.pathname.replace(/[^\/]+$/, '') + "./node_modules/axios"
+               // }
+            ]
        };
     </script>
     <script src="//js.arcgis.com/4.7/"></script>
