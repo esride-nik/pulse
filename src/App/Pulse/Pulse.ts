@@ -35,16 +35,11 @@ export class Pulse {
     private newType: any;
 
     public constructor(map: Map, mapView: MapView) {
-        console.log("PULSE", map, mapView);
         this.map = map;
         this.mapView = mapView;
         this.initalise();
     }
-
-    public callMe(lala: string) {
-        console.log("callMe", lala);
-    }
-
+    
     private initalise(){
 
         //event listeners

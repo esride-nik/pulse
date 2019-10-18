@@ -5,6 +5,7 @@ import Map from 'esri/Map';
 import React from 'react';
 import { Pulse } from './Pulse';
 import { Col, Row, Form, Card, ListGroup, Alert } from 'react-bootstrap';
+import { observable } from 'mobx';
 
 // import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
 // import './PulseComponent.scss'
@@ -13,32 +14,29 @@ import { Col, Row, Form, Card, ListGroup, Alert } from 'react-bootstrap';
 @observer
 export class PulseComponent extends React.Component<{
     appState?: AppState,
-    map: Map,
-    mapView: MapView,
     key: number
 }> {
     private pulse: Pulse;
-    
+
+    @observable
+    private zoom: number;
+
     constructor(props) {
         super(props);
     }
 
     public render() {
-        let { map, mapView } = this.props;
+        let { map, mapView } = this.props.appState;
         const {key} = this.props;
-
-        console.log("PulseComponent", map, mapView);
 
         if (map && mapView && !this.pulse) {
             this.pulse = new Pulse(map, mapView);
+            mapView.watch("zoom", ((e) => {
+                this.zoom = mapView.zoom;
+            }))
         }
 
-        if (this.pulse) {
-            this.pulse.callMe("Whasuuuup!!");
-        }
-
-        return <Alert>allalala</Alert>
-        return <div>nag {key}</div>
+        return <Alert>allalala {this.zoom}</Alert>
     }
 
 }

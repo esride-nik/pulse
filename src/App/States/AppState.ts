@@ -4,7 +4,6 @@ import Map from 'esri/Map';
 
 export class AppState {
 
-
     private _nls: any
     private _nlsCache: { [lang: string]: any } = {}
 
@@ -21,8 +20,12 @@ export class AppState {
     @observable
     public appLevelLoading = false
 
+    @observable
     public map: Map;
+
+    @observable
     public mapView: MapView;
+
     public config: any;
 
     constructor(lang: any, config: any) {
