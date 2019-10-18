@@ -41,6 +41,10 @@ export class Pulse {
         this.initalise();
     }
 
+    public callMe(lala: string) {
+        console.log("callMe", lala);
+    }
+
     private initalise(){
 
         //event listeners
@@ -346,7 +350,7 @@ export class Pulse {
     //     }
     // }
 
-    private createRenderer(now: number): Renderer {
+    private createRenderer(now: number): any {
         let renderer = {
             type: this.newType,
             symbol: this.newSymbol,

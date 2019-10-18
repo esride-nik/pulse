@@ -9,6 +9,7 @@ import { MapComponent } from './Map/MapComponent'
 import { PulseComponent } from './Pulse/PulseComponent'
 import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
+import { Col, Row, Form, Card, ListGroup, Alert } from 'react-bootstrap';
 
 declare var process
 
@@ -40,11 +41,10 @@ class App extends React.Component<{
 
     public render() {
         let key: number = 1; 
-        let PulseComponentNode = this.map && this.mapView ? <PulseComponent key={key} map={this.map} mapView={this.mapView}/> : undefined;
         return (
             <div className="app">
                 <MapComponent returnDataCallback={this.getMapDataCallback}/>
-                {PulseComponentNode}
+                <PulseComponent key={key} map={this.map} mapView={this.mapView}/>
                 {/* {process.env.NODE_ENV === 'development' ? <DevTools /> : null} */}
             </div>
         )

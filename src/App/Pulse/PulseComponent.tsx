@@ -25,6 +25,7 @@ export class PulseComponent extends React.Component<{
 
     public render() {
         let { map, mapView } = this.props;
+        const {key} = this.props;
 
         console.log("PulseComponent", map, mapView);
 
@@ -32,8 +33,11 @@ export class PulseComponent extends React.Component<{
             this.pulse = new Pulse(map, mapView);
         }
 
-        const {key} = this.props;
-        // return <Alert key={key} variant="light">alkfd</Alert>
+        if (this.pulse) {
+            this.pulse.callMe("Whasuuuup!!");
+        }
+
+        return <Alert>allalala</Alert>
         return <div>nag {key}</div>
     }
 

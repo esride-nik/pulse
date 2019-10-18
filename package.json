@@ -4,6 +4,7 @@
   "description": "",
   "main": "webpack.config.js",
   "dependencies": {
+    "@babel/runtime": "^7.3.4",
     "bootstrap": "^4.3.1",
     "core-js": "^2.6.5",
     "es6-object-assign": "^1.1.0",
@@ -11,11 +12,15 @@
     "mobx": "^4.9.2",
     "mobx-react": "^5.4.3",
     "moment": "^2.24.0",
+    "popper.js": "^1.14.7",
     "promise-polyfill": "^8.1.0",
     "react": "^16.8.3",
-    "react-bootstrap": "^1.0.0-beta.14",
+    "react-bootstrap": "^1.0.0-beta.5",
     "react-dom": "^16.8.3",
-    "react-hot-loader": "^4.7.1"
+    "react-hot-loader": "^4.7.1",
+    "react-overlays": "^1.1.2",
+    "react-transition-group": "^2.6.0",
+    "uncontrollable": "^6.1.0"
   },
   "scripts": {
     "start": "webpack-dev-server --mode development --https --pfx=../certificate.pfx --pfx-passphrase=12345678",
