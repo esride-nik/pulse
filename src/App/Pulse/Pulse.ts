@@ -14,7 +14,7 @@ import { Renderer } from "esri/renderers";
 export class Pulse {
 // function(Map, MapView, FeatureLayer, VectorTileLayer, SimpleLineSymbol, watchUtils, webMercatorUtils, Point, dom) {
     //global vars
-    private mapLongLattZoom = [0, 0, 1] //default
+    private mapLongLatZoom = [0, 0, 1] //default
     private endNo: any; //highest number in the attribute
     private startNo: any; //lowest number in attribute
     private fieldToAnimate: any; //attribute selected 
@@ -33,48 +33,49 @@ export class Pulse {
     private geometryType: any; //the geometry type of the feature
     private newSymbol: Symbol;
     private newType: any;
+    private config: any;
 
-    public constructor(map: Map, mapView: MapView) {
+    public constructor(map: Map, mapView: MapView, config: any) {
         this.map = map;
         this.mapView = mapView;
+        this.config = config;
         this.initalise();
     }
     
-    private initalise(){
+    private initalise = () => {
 
         //event listeners
         this.addEventListenerToDocumentElementValueById("play", "click", this.play);
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
         this.addEventListenerToDocumentElementValueById("fs-url", "change", (evt: any) => this.addFeatureLayer);
     
-        // //check URL for paramaters, if there's some. Add it in.
-        // var browserURL = window.location.search
-        // if (browserURL != "") {
-        //     updateField = true
-        //     browserURL = browserURL.replace("?", '')
-        //     var partsOfStr = browserURL.split(',')
-        //     this.getDocumentElementValueById("fs-url") = partsOfStr[0]
-        //     overRidingField = partsOfStr[1]
-        //     this.getDocumentElementValueById("animation-time") = partsOfStr[2]
-        //     mapLongLattZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])]
+        //check URL for paramaters, if there's some. Add it in.
+        var browserURL = window.location.search
+        if (browserURL != "") {
+            this.updateField = true;
+            browserURL = browserURL.replace("?", '');
+            var partsOfStr = browserURL.split(',');
+            // this.getDocumentElementById("fs-url").value = partsOfStr[0];
+            // this.overRidingField = partsOfStr[1];
+            // this.getDocumentElementById("animation-time").value = partsOfStr[2];
+            // this.mapLongLatZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])];
     
-        // } else {
-        //     defaultService()
-        // }
+        } else {
+            this.defaultService();
+        }
 
-        this.mapView.when(function() {
-            // watchUtils.when(this.view, "stationary", updateMapLongLatt)
+        this.mapView.when(() => {
+            this.mapView.watch("stationary", this.updateMapLongLat);
             
-            // var pt = new Point({
-            //     longitude: mapLongLattZoom[0],
-            //     latitude: mapLongLattZoom[1]
-            //   });
+            var pt = new Point({
+                longitude: this.mapLongLatZoom[0],
+                latitude: this.mapLongLatZoom[1]
+              });
     
-            // this.view.goTo({
-            //     target: pt,
-            //     zoom: mapLongLattZoom[2]
-            // })
-            console.log("view init");
+            this.mapView.goTo({
+                target: pt,
+                zoom: this.mapLongLatZoom[2]
+            })
         })
         //once feature layer url has been set, now add it to the map.
         // addFeatureLayer()
@@ -97,24 +98,26 @@ export class Pulse {
         return element ? element.value : "";
     }
 
-    // //if there's no paramaters, then add these in as a default.
-    // private defaultService() {
-    //     this.getDocumentElementValueById("fs-url") = "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0"
-    //     this.getDocumentElementValueById("animation-time") = 10
-    // }
+    //if there's no parameters, then add these in as a default.
+    private defaultService() {
+        this.getDocumentElementById("fs-url").value = this.config.defaultService;
+        this.getDocumentElementById("animation-time").value = "10";
+    }
 
     //this generates a new, sharable url link.
     private updateBrowserURL() {
         history.pushState({
             id: 'homepage'
-        }, 'Home', '?' + this.getDocumentElementValueById("fs-url") + ',' + this.getDocumentElementValueById("selection") + ',' + this.getDocumentElementValueById("animation-time") + ',' + this.mapLongLattZoom);
+        }, 'Home', '?' + this.getDocumentElementValueById("fs-url") + ',' + this.getDocumentElementValueById("selection") + ',' + this.getDocumentElementValueById("animation-time") + ',' + this.mapLongLatZoom);
     }
 
-    // //when map moves, update url.
-    // private updateMapLongLatt() {
-    //     mapLongLattZoom = [view.center.longitude, view.center.latitude, view.zoom]
-    //     updateBrowserURL()
-    // }
+    //when map moves, update url.
+    private updateMapLongLat = () => {
+        if (this.mapView && this.mapView.center) {
+            this.mapLongLatZoom = [this.mapView.center.longitude, this.mapView.center.latitude, this.mapView.zoom];
+        }
+        this.updateBrowserURL();
+    }
 
     //adds the feature layer to the map.
     private addFeatureLayer(evt: any) {
@@ -220,7 +223,7 @@ export class Pulse {
         }
 
         //update with changed values.
-        this.updateBrowserURL()
+        this.updateBrowserURL();
 
         //queries the current feature layer url and field to work out start and end frame.
         this.getMaxMin();

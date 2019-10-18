@@ -1,0 +1,22 @@
+@mixin fillVertical {
+    padding:0;
+    margin:0;
+    height:100vh;
+}
+
+$kl-red: #ED1D23;
+$kl-red-highlight: rgb(255, 195, 197);
+$bg-lightred-highlight: #fff2f2;
+
+$bg-grey: #f8f9fa;
+$bg-grey-highlight: #e9e9e9;
+$bo-grey-dark: #a5a5a5;
+
+$ok-petrol: rgb(3, 224, 173);
+$ok-petrol-highlight:rgb(125, 253, 223);
+
+$ok-green: rgb(3, 223, 76);
+$ok-green-highlight:rgb(163, 255, 194);
+
+$header-cyan: #17a2b8;
+$bg-cyan-highlight: #eefdff;

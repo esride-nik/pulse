@@ -1,15 +1,30 @@
-
-body {
-    padding: 0;
-    margin: 0;
-    font-family: Roboto, sans-serif;
-    overflow: hidden;
-    font-size: 11pt;
+@mixin fillVertical {
+    padding:0;
+    margin:0;
+    height:100vh;
 }
+
 
 * {
     box-sizing: border-box;
 }
+
+body {
+    @include fillVertical();
+    font-family: Roboto, sans-serif;
+    overflow: hidden;
+    font-size: 0.8rem;
+}
+
+#root, .app {
+    @include fillVertical();
+    width: 100vw;
+}
+
+.pulseCol {
+    @include fillVertical();
+}
+
 button,
 input,
 select {
@@ -17,9 +32,12 @@ select {
     font-size: inherit;
 }
 
-.app {
+.mapCol {
+    @include fillVertical();
+    border-right:1px #c4c4c4 solid;
+}
 
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+.map {
+    height:100%;
+    width:100%;
 }

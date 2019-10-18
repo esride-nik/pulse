@@ -7,6 +7,7 @@ import { AppState } from './States/AppState';
 import { computed, observable, action } from 'mobx';
 import { MapComponent } from './Map/MapComponent';
 import { PulseComponent } from './Pulse/PulseComponent';
+import { Container, Col, Row, Form, Card, ListGroup, Alert } from 'react-bootstrap';
 
 @inject('appState')
 @observer
@@ -23,13 +24,19 @@ class App extends React.Component<{
     }
 
     public render() {
-        let key: number = 1; 
+        let key=1;
         return (
-            <div className="app">
-                <MapComponent />
-                <PulseComponent key={key}/>
-                {/* {process.env.NODE_ENV === 'development' ? <DevTools /> : null} */}
-            </div>
+            <Container className={"app"}>
+                <Row className={"app"}>
+                    <Col className={"mapCol"}>
+                        <MapComponent />
+                    </Col>
+                    <Col className={"pulseCol"} xs={3}>
+                        <PulseComponent key={key}/>
+                    </Col>
+                    {/* {process.env.NODE_ENV === 'development' ? <DevTools /> : null} */}
+                </Row>
+            </Container>
         )
     }
 }
