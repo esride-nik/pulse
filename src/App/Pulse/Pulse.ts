@@ -12,8 +12,6 @@ import { Renderer } from "esri/renderers";
 import axios from 'axios';
 
 export class Pulse {
-// function(Map, MapView, FeatureLayer, VectorTileLayer, SimpleLineSymbol, watchUtils, webMercatorUtils, Point, dom) {
-    //global vars
     private mapLongLatZoom = [0, 0, 1] //default
     private endNo: any; //highest number in the attribute
     private startNo: any; //lowest number in attribute
@@ -47,7 +45,7 @@ export class Pulse {
         //event listeners
         this.addEventListenerToDocumentElementValueById("play", "click", this.play);
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
-        this.addEventListenerToDocumentElementValueById("fs-url", "change", (evt: any) => this.addFeatureLayer);
+        this.addEventListenerToDocumentElementValueById("fs-url", "change", this.addFeatureLayer);
     
         //check URL for paramaters, if there's some. Add it in.
         var browserURL = window.location.search
@@ -120,7 +118,7 @@ export class Pulse {
     }
 
     //adds the feature layer to the map.
-    private addFeatureLayer() {
+    private addFeatureLayer = () => {
         let flURL = this.getDocumentElementValueById("fs-url");
 
         if (flURL != "") {
@@ -201,10 +199,9 @@ export class Pulse {
         }
     }
 
-    private play(){
-        console.log("play");
+    private play = () => {
         //Stops any previously added animations in the frame
-        this.stopAnimation()
+        this.stopAnimation();
 
         //There's an unknown issue caused by "ObjectID"
         //This is currently a workaround for it.
@@ -225,42 +222,38 @@ export class Pulse {
         this.getMaxMin();
     }
 
-    private getMaxMin() {
-        var flURL = this.getDocumentElementValueById("fs-url")
-        var field = this.getDocumentElementValueById("selection")
-        console.log("REST call 2");
+    private getMaxMin = () => {
+        let flURL = this.getDocumentElementValueById("fs-url");
+        let field = this.getDocumentElementValueById("selection");
 
-//         axios.get({
-//             url: flURL + "/query",
-//             type: "GET",
-//             data: {
-//                 'f': 'pjson',
-//                 'outStatistics': '[{"statisticType":"min","onStatisticField":"' + field +
-//                     '", "outStatisticFieldName":"MinID"},{"statisticType":"max","onStatisticField":"' +
-//                     field + '", "outStatisticFieldName":"MaxID"}]'
-//             }
-//         }).then(function(data: string) {
-//             var dataJSONObj = JSON.parse(data)
-// ;
-//             this.fieldToAnimate = field;
-//             this.startNumber(dataJSONObj.features[0].attributes.MinID);
-//             this.endNo = dataJSONObj.features[0].attributes.MaxID;
+        axios.get(flURL + "/query", {
+            params: {
+                'f': 'pjson',
+                'outStatistics': '[{"statisticType":"min","onStatisticField":"' + field +
+                    '", "outStatisticFieldName":"MinID"},{"statisticType":"max","onStatisticField":"' +
+                    field + '", "outStatisticFieldName":"MaxID"}]'
+            }
+          }).then((queryResponse: any) => {
+            let responseData = queryResponse.data;
+            this.fieldToAnimate = field;
+            this.startNumber(responseData.features[0].attributes.MinID);
+            this.endNo = responseData.features[0].attributes.MaxID;
 
-//             //generate step number here too
-//             var difference = Math.abs(dataJSONObj.features[0].attributes.MinID - dataJSONObj.features[0].attributes.MaxID);
-//             var differencePerSecond = difference / this.getDocumentElementValueById("animation-time");
-//             this.stepNumber = differencePerSecond / this.setIntervalSpeed;
-//             this.startNo = dataJSONObj.features[0].attributes.MinID;
-//             this.animate(dataJSONObj.features[0].attributes.MinID);
+            //generate step number here too
+            let difference = Math.abs(responseData.features[0].attributes.MinID - responseData.features[0].attributes.MaxID);
+            let animationTime: number = Number.parseInt(this.getDocumentElementValueById("animation-time"));
+            let differencePerSecond = difference / animationTime;
+            this.stepNumber = differencePerSecond / this.setIntervalSpeed;
+            this.startNo = responseData.features[0].attributes.MinID;
+            this.animate(responseData.features[0].attributes.MinID);
 
-//             //adding empty frames at the start and end for fade in/out
-//             this.endNo += this.stepNumber * 40;
-//             this.startNo -= this.stepNumber * 2;
-//         });
-
+            //adding empty frames at the start and end for fade in/out
+            this.endNo += this.stepNumber * 40;
+            this.startNo -= this.stepNumber * 2;
+        });
     }
 
-    private stopAnimation() {;
+    private stopAnimation() {
         this.startNumber(0);
         this.stepNumber = null;
         this.fieldToAnimate = null;
@@ -273,39 +266,39 @@ export class Pulse {
         this.featureLayer.renderer = this.createRenderer(value);
     }
 
-    // private animate(startValue) {
-    //     var currentFrame = startValue
+    private animate(startValue) {
+        var currentFrame = startValue;
 
-    //     var frame = function(timestamp) {
-    //         if (restarting) {
-    //             clearTimeout(intervalFunc);
-    //             restating = false
-    //         }
+        var frame = () => {
+            if (this.restarting) {
+                clearTimeout(this.intervalFunc);
+                this.restarting = false;
+            }
 
-    //         currentFrame += stepNumber
+            currentFrame += this.stepNumber;
             
-    //         if (currentFrame > endNo) {
-    //             currentFrame = startNo
-    //         }
+            if (currentFrame > this.endNo) {
+                currentFrame = this.startNo;
+            }
 
-    //         startNumber(currentFrame)
+            this.startNumber(currentFrame);
 
-    //         //animation loop.
-    //         intervalFunc = setTimeout(function() {
-    //             //stops it from overloading.
-    //             requestAnimationFrame(frame)
-    //         }, setIntervalSpeed)
-    //     }
+            //animation loop.
+            this.intervalFunc = setTimeout(function() {
+                //stops it from overloading.
+                requestAnimationFrame(frame);
+            }, this.setIntervalSpeed);
+        }
 
-    //     //recusrive function, starting the animation.
-    //     frame()
+        // recursive function, starting the animation.
+        frame();
 
-    //     return {
-    //         remove: function() {
-    //             animating = false
-    //         }
-    //     };
-    // }
+        return {
+            remove: function() {
+                this.animating = false;
+            }
+        };
+    }
 
 
     //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)
