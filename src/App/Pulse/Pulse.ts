@@ -9,7 +9,7 @@ import Point = require("esri/geometry/Point");
 import dom = require("dojo/dom");
 import { Extent } from "esri/geometry";
 import { Renderer } from "esri/renderers";
-// import axios from 'axios';
+import axios from 'axios';
 
 export class Pulse {
 // function(Map, MapView, FeatureLayer, VectorTileLayer, SimpleLineSymbol, watchUtils, webMercatorUtils, Point, dom) {
@@ -55,10 +55,10 @@ export class Pulse {
             this.updateField = true;
             browserURL = browserURL.replace("?", '');
             var partsOfStr = browserURL.split(',');
-            // this.getDocumentElementById("fs-url").value = partsOfStr[0];
-            // this.overRidingField = partsOfStr[1];
-            // this.getDocumentElementById("animation-time").value = partsOfStr[2];
-            // this.mapLongLatZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])];
+            this.getDocumentElementById("fs-url").value = partsOfStr[0];
+            this.overRidingField = partsOfStr[1];
+            this.getDocumentElementById("animation-time").value = partsOfStr[2];
+            this.mapLongLatZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])];
     
         } else {
             this.defaultService();
@@ -78,7 +78,7 @@ export class Pulse {
             })
         })
         //once feature layer url has been set, now add it to the map.
-        // addFeatureLayer()
+        this.addFeatureLayer();
     }
 
     private addEventListenerToDocumentElementValueById(elementId: string, eventName: string, eventListener: EventListener) {
@@ -120,93 +120,89 @@ export class Pulse {
     }
 
     //adds the feature layer to the map.
-    private addFeatureLayer(evt: any) {
-        var flURL = <HTMLInputElement>document.getElementById("fs-url");
-        // var flURL = this.getDocumentElementValueById("fs-url");
+    private addFeatureLayer() {
+        let flURL = this.getDocumentElementValueById("fs-url");
 
         if (flURL != "") {
             this.featureLayer = new FeatureLayer({
                 url: flURL
             });
-            this.map.removeAll()
-            this.map.add(this.featureLayer)
+            this.map.removeAll();
+            this.map.add(this.featureLayer);
 
             //overides ANY scale threshold added to feature layer.
-            this.featureLayer.maxScale = 0 
-            this.featureLayer.minScale = 100000000000 
+            this.featureLayer.maxScale = 0; 
+            this.featureLayer.minScale = 100000000000 ;
 
             //rest call to get attribute minimum and maximum values.
-            this.getFields(flURL)
+            this.getFields(flURL);
 
-            this.getDocumentElementById("fs-url").style.borderBottomColor = "green"
+            this.getDocumentElementById("fs-url").style.borderBottomColor = "green";
         } else {
-            this.map.remove(this.featureLayer)
-            this.getDocumentElementById("fs-url").style.borderBottomColor = "red"
+            this.map.remove(this.featureLayer);
+            this.getDocumentElementById("fs-url").style.borderBottomColor = "red";
         }
 
     }
 
     //populating selection drop down based on featurelayer.
     private getFields(flURL: string) {
-        console.log("REST call 1");
-        // axios.get({
-        //     url: flURL + "?f=json",
-        //     type: "GET"
-        // }).then(function(FLfields: any) {
-        //     var fieldsObj = JSON.parse(FLfields)
-        //     this.getDocumentElementValueById("feature-layer-name").innerHTML = fieldsObj.name
-        //     this.updateExtent(fieldsObj.extent)
-        //     this.select = this.getDocumentElementValueById('selection')
-        //     if (this.select) {
-        //         this.select.innerHTML = ''
-        //     }
+        axios.get(flURL + "?f=json").then((flResponse: any) => {
+            var flData = flResponse.data;
+            let flNameElement = this.getDocumentElementById("feature-layer-name");
+            flNameElement.innerHTML = flData.name;
+            this.updateExtent(flData.extent);
+            this.select = this.getDocumentElementById('selection');
+            if (this.select) {
+                this.select.innerHTML = '';
+            }
 
-        //     this.geometryType = fieldsObj.geometryType
-        //     this.symbolSwitcher(this.geometryType)
+            this.geometryType = flData.geometryType;
+            this.symbolSwitcher(this.geometryType);
 
-        //     for (let i = 0; i < fieldsObj.fields.length; i++) {
-        //         if (fieldsObj.fields[i].sqlType != "sqlTypeNVarchar") {
+            for (let i = 0; i < flData.fields.length; i++) {
+                if (flData.fields[i].sqlType != "sqlTypeNVarchar") {
+                    var opt = document.createElement('option');
+                    opt.value = flData.fields[i].name;
+                    opt.innerHTML = flData.fields[i].name;
 
-        //             var opt = document.createElement('option')
-        //             opt = fieldsObj.fields[i].name
-        //             opt.innerHTML = fieldsObj.fields[i].name
+                    if (i === 0 && this.updateField === true) {
+                        opt.value = this.overRidingField;
+                        opt.innerHTML = this.overRidingField;
+                    }
 
-        //             if (i === 0 && this.updateField === true) {
-        //                 opt = this.overRidingField
-        //                 opt.innerHTML = this.overRidingField
-        //             }
+                    if (this.updateField === true && flData.fields[i].name === this.overRidingField) {
+                        opt.value = flData.fields[0].name;
+                        opt.innerHTML = flData.fields[0].name;
+                        this.updateField = false;
+                    }
 
-        //             if (this.updateField === true && fieldsObj.fields[i].name === this.overRidingField) {
-        //                 opt = fieldsObj.fields[0].name
-        //                 opt.innerHTML = fieldsObj.fields[0].name
-        //                 this.updateField = false
-        //             }
+                    if (this.select) {
+                        this.select.appendChild(opt);
+                    }
+                }
 
-        //             if (this.select) {
-        //                 this.select.appendChild(opt)
-        //             }
-        //         }
-
-        //     }
-        //     this.updateBrowserURL();
-        // });
+            }
+            this.updateBrowserURL();
+        });
     }
 
-    // private updateExtent(newExtent: Extent) {
-    //     if (newExtent.spatialReference.wkid === 102100) {
-    //         view.extent = newExtent
-    //     }
-    //     if (newExtent.spatialReference.wkid != 102100) {
-    //         view.extent = {
-    //             xmax: 20026375.71466102,
-    //             xmin: -20026375.71466102,
-    //             ymax: 9349764.174146919,
-    //             ymin: -5558767.721795811
-    //         }
-    //     }
-    // }
+    private updateExtent(newExtent: Extent) {
+        if (newExtent.spatialReference.wkid === 102100) {
+            this.mapView.extent = newExtent
+        }
+        if (newExtent.spatialReference.wkid != 102100) {
+            this.mapView.extent = {
+                xmax: 20026375.71466102,
+                xmin: -20026375.71466102,
+                ymax: 9349764.174146919,
+                ymin: -5558767.721795811
+            } as Extent;
+        }
+    }
 
     private play(){
+        console.log("play");
         //Stops any previously added animations in the frame
         this.stopAnimation()
 
@@ -312,41 +308,41 @@ export class Pulse {
     // }
 
 
-    // //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)
-    // private symbolSwitcher(geometryType) {
-    //     //Depending on the feature layer currently added, the symbology will change here.
-    //     //Supporting points, lines and polygons.
-    //     if (geometryType === "esriGeometryPoint") {
-    //         newSymbol = {
-    //             type: "picture-marker",
-    //             url: "images/PointIconImages/2.png",
-    //             width: 20,
-    //             height: 20
-    //         }
+    //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)
+    private symbolSwitcher(geometryType) {
+        //Depending on the feature layer currently added, the symbology will change here.
+        //Supporting points, lines and polygons.
+        if (geometryType === "esriGeometryPoint") {
+            this.newSymbol = {
+                type: "picture-marker",
+                url: "images/PointIconImages/2.png",
+                width: 20,
+                height: 20
+            } as unknown as Symbol;
 
-    //         newType = 'simple'
-    //     }
+            this.newType = 'simple';
+        }
 
-    //     if (geometryType === "esriGeometryPolyline") {
-    //         newSymbol = {
-    //             type: 'simple-line',
-    //             width: 3,
-    //             color: 'rgb(55, 55, 255)',
-    //             opacity: 1
-    //         }
+        if (geometryType === "esriGeometryPolyline") {
+            this.newSymbol = {
+                type: 'simple-line',
+                width: 3,
+                color: 'rgb(55, 55, 255)',
+                opacity: 1
+            } as unknown as Symbol;
 
-    //         newType = 'simple'
-    //     }
+            this.newType = 'simple';
+        }
 
-    //     if (geometryType === "esriGeometryPolygon") {
-    //         newSymbol = {
-    //             type: "simple-fill",
-    //             color: "rgb(55, 55, 255)"
-    //         }
+        if (geometryType === "esriGeometryPolygon") {
+            this.newSymbol = {
+                type: "simple-fill",
+                color: "rgb(55, 55, 255)"
+            } as unknown as Symbol;
 
-    //         newType = 'simple'
-    //     }
-    // }
+            this.newType = 'simple';
+        }
+    }
 
     private createRenderer(now: number): any {
         let renderer = {

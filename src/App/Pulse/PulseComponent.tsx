@@ -4,7 +4,7 @@ import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
 import React from 'react';
 import { Pulse } from './Pulse';
-import { Container, Col, Row, Form, Card, ListGroup, Alert } from 'react-bootstrap';
+import { Container, Col, Row, Form, Card, ListGroup, Alert, Button } from 'react-bootstrap';
 import { observable } from 'mobx';
 
 // import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
@@ -42,14 +42,14 @@ export class PulseComponent extends React.Component<{
                     <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url"/>
                     <div id="feature-layer-name">...</div>
                 </Row>
-                <Row>Select attribute to animate</Row>
                 <Row>
-                    <select id="selection">
+                    Select attribute to animate
+                    <Form.Control as="select" id="selection">
                         <option></option>
-                    </select>
-                    for 
-                    <input type="text" id="animation-time" /> seconds
-                    <button id="play">►</button>
+                    </Form.Control>
+                    for
+                    <Form.Control type="text" id="animation-time" placeholder="Enter duration in seconds here" className="animation-time"/> seconds
+                    <Button variant="light" id="play">►</Button>
                 </Row>
             </Container>
         );
