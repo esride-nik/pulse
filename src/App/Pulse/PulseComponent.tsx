@@ -49,7 +49,10 @@ export class PulseComponent extends React.Component<{
                     </Form.Control>
                     for
                     <Form.Control type="text" id="animation-time" placeholder="Enter duration in seconds here" className="animation-time"/> seconds
-                    <Button variant="light" id="play">►</Button>
+                </Row>
+                <Row>
+                    <Button variant="light" id="play">&#9658;</Button>
+                    <Button variant="light" id="stop">&#9632;</Button>
                 </Row>
             </Container>
         );

@@ -23,6 +23,7 @@ body {
 
 .pulseCol {
     @include fillVertical();
+    padding: 10px;
 }
 
 button,

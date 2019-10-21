@@ -32,6 +32,8 @@ export class Pulse {
     private newSymbol: Symbol;
     private newType: any;
     private config: any;
+    private animation: { remove: () => void; };
+    private animating: any;
 
     public constructor(map: Map, mapView: MapView, config: any) {
         this.map = map;
@@ -44,6 +46,7 @@ export class Pulse {
 
         //event listeners
         this.addEventListenerToDocumentElementValueById("play", "click", this.play);
+        this.addEventListenerToDocumentElementValueById("stop", "click", this.stopAnimation);
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
         this.addEventListenerToDocumentElementValueById("fs-url", "change", this.addFeatureLayer);
     
@@ -243,9 +246,10 @@ export class Pulse {
             let difference = Math.abs(responseData.features[0].attributes.MinID - responseData.features[0].attributes.MaxID);
             let animationTime: number = Number.parseInt(this.getDocumentElementValueById("animation-time"));
             let differencePerSecond = difference / animationTime;
+
             this.stepNumber = differencePerSecond / this.setIntervalSpeed;
             this.startNo = responseData.features[0].attributes.MinID;
-            this.animate(responseData.features[0].attributes.MinID);
+            this.animation = this.animate(responseData.features[0].attributes.MinID);
 
             //adding empty frames at the start and end for fade in/out
             this.endNo += this.stepNumber * 40;
@@ -253,7 +257,10 @@ export class Pulse {
         });
     }
 
-    private stopAnimation() {
+    private stopAnimation = () => {
+        if (this.animation) {
+            this.animation.remove();
+        }
         this.startNumber(0);
         this.stepNumber = null;
         this.fieldToAnimate = null;
@@ -267,6 +274,7 @@ export class Pulse {
     }
 
     private animate(startValue) {
+        this.animating = true;
         var currentFrame = startValue;
 
         var frame = () => {
@@ -284,17 +292,19 @@ export class Pulse {
             this.startNumber(currentFrame);
 
             //animation loop.
-            this.intervalFunc = setTimeout(function() {
-                //stops it from overloading.
-                requestAnimationFrame(frame);
-            }, this.setIntervalSpeed);
+            if (this.animating) {
+                this.intervalFunc = setTimeout(function() {
+                    //stops it from overloading.
+                    requestAnimationFrame(frame);
+                }, this.setIntervalSpeed);
+            }
         }
 
         // recursive function, starting the animation.
         frame();
 
         return {
-            remove: function() {
+            remove: () => {
                 this.animating = false;
             }
         };
