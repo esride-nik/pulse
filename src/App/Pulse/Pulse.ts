@@ -34,6 +34,8 @@ export class Pulse {
     private config: any;
     private animation: { remove: () => void; };
     private animating: any;
+    orgEndNo: any;
+    orgStartNo: any;
 
     public constructor(map: Map, mapView: MapView, config: any) {
         this.map = map;
@@ -247,11 +249,15 @@ export class Pulse {
             let animationTime: number = Number.parseInt(this.getDocumentElementValueById("animation-time"));
             let differencePerSecond = difference / animationTime;
 
+            console.log(responseData.features[0].attributes.MinID, responseData.features[0].attributes.MaxID, difference);
+
             this.stepNumber = differencePerSecond / this.setIntervalSpeed;
             this.startNo = responseData.features[0].attributes.MinID;
             this.animation = this.animate(responseData.features[0].attributes.MinID);
 
             //adding empty frames at the start and end for fade in/out
+            this.orgEndNo = this.endNo;
+            this.orgStartNo = this.startNo;
             this.endNo += this.stepNumber * 40;
             this.startNo -= this.stepNumber * 2;
         });
@@ -273,11 +279,12 @@ export class Pulse {
         this.featureLayer.renderer = this.createRenderer(value);
     }
 
-    private animate(startValue) {
+    private animate(startValue: number) {
         this.animating = true;
-        var currentFrame = startValue;
+        let currentFrame = startValue;
+        let selection = this.getDocumentElementValueById("selection");
 
-        var frame = () => {
+        let frame = () => {
             if (this.restarting) {
                 clearTimeout(this.intervalFunc);
                 this.restarting = false;
@@ -289,6 +296,8 @@ export class Pulse {
                 currentFrame = this.startNo;
             }
 
+            let displayNow: number = this.displayNow(currentFrame);
+            this.getDocumentElementById("displayNow").innerHTML = selection + " " + displayNow.toString();
             this.startNumber(currentFrame);
 
             //animation loop.
@@ -310,6 +319,16 @@ export class Pulse {
         };
     }
 
+    private displayNow(currentFrame: number) {
+        let displayNow: number = Math.round(currentFrame);
+        if (Math.round(currentFrame) < this.orgStartNo) {
+            displayNow = this.orgStartNo;
+        }
+        else if (Math.round(currentFrame) > this.orgEndNo) {
+            displayNow = this.orgEndNo;
+        }
+        return displayNow;
+    }
 
     //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)
     private symbolSwitcher(geometryType) {

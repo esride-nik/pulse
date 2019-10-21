@@ -4,11 +4,11 @@ import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
 import React from 'react';
 import { Pulse } from './Pulse';
-import { Container, Col, Row, Form, Card, ListGroup, Alert, Button } from 'react-bootstrap';
+import { Container, Col, Row, Form, Card, ListGroup, Alert, Button, Badge } from 'react-bootstrap';
 import { observable } from 'mobx';
 
 // import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
-// import './PulseComponent.scss'
+import './PulseComponent.scss';
 
 @inject('appState')
 @observer
@@ -53,6 +53,9 @@ export class PulseComponent extends React.Component<{
                 <Row>
                     <Button variant="light" id="play">&#9658;</Button>
                     <Button variant="light" id="stop">&#9632;</Button>
+                </Row>
+                <Row>
+                    <Badge variant="info" id="displayNow"></Badge>
                 </Row>
             </Container>
         );
