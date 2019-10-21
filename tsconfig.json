@@ -13,7 +13,7 @@
     "noLib": false,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
-    "outDir": "./dist/",
+    "outDir": "./docs/",
     "sourceMap": true,
     "noEmitOnError": false,
     "importHelpers": true,

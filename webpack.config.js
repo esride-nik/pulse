@@ -25,7 +25,8 @@ var webpackConfig = {
   output: {
     filename: "[name].js",
     publicPath: "",
-    libraryTarget: "amd-require"
+    libraryTarget: "amd-require",
+    path: __dirname + "/docs"
   },
   devServer: {
     host: '0.0.0.0',
@@ -92,7 +93,7 @@ var webpackConfig = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(["dist"]),
+    new CleanWebpackPlugin(["docs"]),
     new HtmlWebPackPlugin({
       title: "ArcGIS Template Application",
       template: "./src/index.html",

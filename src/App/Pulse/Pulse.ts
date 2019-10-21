@@ -329,6 +329,7 @@ export class Pulse {
         }
         return displayNow;
     }
+    
 
     //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)
     private symbolSwitcher(geometryType) {
@@ -337,7 +338,7 @@ export class Pulse {
         if (geometryType === "esriGeometryPoint") {
             this.newSymbol = {
                 type: "picture-marker",
-                url: "images/PointIconImages/2.png",
+                url: "./images/PointIconImages/2.png",
                 width: 20,
                 height: 20
             } as unknown as Symbol;
