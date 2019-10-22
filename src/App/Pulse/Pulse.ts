@@ -164,17 +164,18 @@ export class Pulse {
             this.symbolSwitcher(this.geometryType);
 
             for (let i = 0; i < flData.fields.length; i++) {
-                if (flData.fields[i].sqlType != "sqlTypeNVarchar") {
+                let field = flData.fields[i];
+                if (field.sqlType != "sqlTypeNVarchar" && field.type != "esriFieldTypeString") {
                     var opt = document.createElement('option');
-                    opt.value = flData.fields[i].name;
-                    opt.innerHTML = flData.fields[i].name;
+                    opt.value = field.name;
+                    opt.innerHTML = field.name;
 
                     if (i === 0 && this.updateField === true) {
                         opt.value = this.overRidingField;
                         opt.innerHTML = this.overRidingField;
                     }
 
-                    if (this.updateField === true && flData.fields[i].name === this.overRidingField) {
+                    if (this.updateField === true && field.name === this.overRidingField) {
                         opt.value = flData.fields[0].name;
                         opt.innerHTML = flData.fields[0].name;
                         this.updateField = false;
