@@ -62,19 +62,31 @@ export class SetlistFmComponent extends React.Component<{
             console.log("Setlists response", response.data);
             this.props.appState.venueFeatures = [];
             if (response.data && response.data.setlist) {
+                let graphics: Graphic[] = [];
                 response.data.setlist.map((setlist: any) => {
                     let venueLocation: Point;
                     if (setlist.venue && setlist.venue.city && setlist.venue.city.coords) {
                         venueLocation = new Point({
                             x: setlist.venue.city.coords.long,
-                            y: setlist.venue.city.coords.lat
+                            y: setlist.venue.city.coords.lat,
+                            spatialReference: {
+                                wkid: 4326
+                            }
                         });
                     }
-                    this.props.appState.venueFeatures.push(new Graphic({
+                    graphics.push(new Graphic({
                         attributes: setlist,
-                        geometry: venueLocation
+                        geometry: venueLocation,
+                        symbol: {
+                            type: "picture-marker",
+                            url:
+                              "https://arcgis.github.io/arcgis-samples-javascript/sample-data/cat3.png",
+                            width: 46,
+                            height: 46
+                        }
                     }));
                 });
+                this.props.appState.venueFeatures = graphics;
             }
         });
     }

@@ -1,7 +1,7 @@
 import { observable, computed } from 'mobx'
 import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
-import Graphic from 'esri/Graphic';
+import { Point } from 'esri/geometry';
 
 export class AppState {
 
