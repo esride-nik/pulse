@@ -3,10 +3,10 @@ import { AppState } from '../States/AppState';
 import React from 'react';
 import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
-import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import './MapComponent.scss';
 import Graphic from 'esri/Graphic';
 import { Extent, Point, Geometry } from 'esri/geometry';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 
 @inject('appState')
 @observer
@@ -61,27 +61,60 @@ export class MapComponent extends React.Component<{
         return extent;
     }
 
+    private venueGraphicsToFeatureLayer() {
+        console.log("MapComponent adding Graphics", this.props.appState.venueGraphics);
+
+        let fullExtent: Extent = new Extent();
+        this.props.appState.venueGraphics.map((venueGraphic: Graphic) => {
+            fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
+        });
+
+        const venuesFeatureLayer = new FeatureLayer({
+            // create an instance of esri/layers/support/Field for each field object
+
+            fields: [{
+                name: "eventDate",
+                alias: "eventDate",
+                type: "integer"
+            },
+            {
+                name: "id",
+                alias: "id",
+                type: "string"
+            },
+            {
+                name: "info",
+                alias: "info",
+                type: "string"
+            },
+            {
+                name: "url",
+                alias: "url",
+                type: "string"
+            }],
+            objectIdField: "ObjectID",
+            geometryType: "point",
+            spatialReference: { wkid: 4326 },
+            source: this.props.appState.venueGraphics,  //  an array of graphics with geometry and attributes
+                              // popupTemplate and symbol are not required in each feature
+                              // since those are handled with the popupTemplate and
+                              // renderer properties of the layer
+            // popupTemplate: pTemplate,
+            // renderer: uvRenderer,  // UniqueValueRenderer based on `type` attribute
+            id: "venueFeatures",
+            title: "Venues",
+            fullExtent: fullExtent
+        });
+        this.map.removeAll();
+        this.map.add(venuesFeatureLayer);
+        this.mapView.goTo(venuesFeatureLayer.fullExtent);
+    }
+
     public render() {
         if (this.props.appState.venueGraphics && this.props.appState.venueGraphics.length>0) {
-            console.log("MapComponent adding Graphics", this.props.appState.venueGraphics);
-
-            let venueGraphicsLayer = new GraphicsLayer({
-                id: "venueFeatures",
-                title: "Venues"
-            });
-            let fullExtent: Extent = new Extent();
-            this.props.appState.venueGraphics.map((venueGraphic: Graphic) => {
-                venueGraphicsLayer.graphics.push(venueGraphic);
-                fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
-            });
-            venueGraphicsLayer.fullExtent = fullExtent;
-            // this.map.remove(this.map.findLayerById("venueFeatures"));
-            this.map.removeAll();
-            this.map.add(venueGraphicsLayer);
-            this.mapView.goTo(venueGraphicsLayer.fullExtent);
+            this.venueGraphicsToFeatureLayer();
         }
 
         return <div className="map" ref={this.mapNode}></div>
     }
-
 }

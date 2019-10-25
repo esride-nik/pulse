@@ -49,19 +49,6 @@ export class SetlistFmComponent extends React.Component<{
         return setlistFmDate.substr(6,4) + "-" + setlistFmDate.substr(3,2) + "-" + setlistFmDate.substr(0,2);
     }
 
-    private setVenueGraphics = (graphics: Graphic[]) => {
-        let fieldName = this.props.appState.config.setlistFmConnector.setlistDateField;
-        this.props.appState.venueGraphics = graphics;
-        this.props.appState.fieldToAnimate = fieldName;
-        let fieldToAnimateValues = graphics.map((graphic: Graphic) => {
-            let eventDate = this.reformatSetlistFmDate(graphic.attributes[fieldName]);
-            console.log(eventDate, Date.parse(eventDate));
-            return Date.parse(eventDate);
-        });
-        this.props.appState.fieldToAnimateMinValue = Math.min(...fieldToAnimateValues);
-        this.props.appState.fieldToAnimateMaxValue = Math.max(...fieldToAnimateValues);
-    }
-
     public querySetlists = () => {
         const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;
 
@@ -91,8 +78,21 @@ export class SetlistFmComponent extends React.Component<{
                             }
                         });
                     }
+
+
+            // artist: {mbid: "3cd7b958-b101-49cc-98fe-4a9d99edb03e", name: "Black Peaks", sortName: "Black Peaks", disambiguation: "UK aggressive hardcore, post rock, formerly Shrine", url: "https://www.setlist.fm/setlists/black-peaks-6bd89236.html"}
+            // sets: {set: Array(2)}
+            // venue: {id: "3bd4b464", name: "Brighton Electric", city: {…}, url: "https://www.setlist.fm/venue/brighton-electric-brighton-england-3bd4b464.html"}
+
+
+                    let attributes = {
+                        "eventDate": Date.parse(this.reformatSetlistFmDate(setlist.eventDate)),
+                        "id": setlist.id,
+                        "info": setlist.info,
+                        "url": setlist.url
+                    }
                     graphics.push(new Graphic({
-                        attributes: setlist,
+                        attributes: attributes,
                         geometry: venueLocation,
                         symbol: {
                             type: "picture-marker",
@@ -103,7 +103,8 @@ export class SetlistFmComponent extends React.Component<{
                         }
                     }));
                 });
-                this.setVenueGraphics(graphics);
+                this.props.appState.venueGraphics = graphics;
+                this.props.appState.fieldToAnimate = "eventDate";
             }
         });
     }

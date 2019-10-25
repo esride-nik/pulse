@@ -28,6 +28,9 @@ export class PulseComponent extends React.Component<{
         if (map && mapView && !this.pulse) {
             this.pulse = new Pulse(map, mapView, config);
         }
+        // if (this.pulse && this.props.appState.fieldToAnimate && this.props.appState.fieldToAnimateMinValue && this.props.appState.fieldToAnimateMaxValue) {
+        //     this.pulse.setMinMaxFromGraphicsLayer(this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue, 10);
+        // }
 
         return (
             <Container>

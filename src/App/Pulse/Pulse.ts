@@ -242,15 +242,12 @@ export class Pulse {
         });
     }
 
-    private getMaxMinFromGraphicLayer = () => {
-        // this.fieldToAnimate
-        
-        // let responseData = queryResponse.data;
-        // this.startNo = responseData.features[0].attributes.MinID;
-        // this.endNo = responseData.features[0].attributes.MaxID;
-
-        this.calculateParametersAndStartAnimation(Number.parseInt(this.getDocumentElementValueById("animation-time")));
-    }
+    // public setMinMaxFromGraphicsLayer = (fieldName: string, minValue: number, maxValue: number, animationTime: number) => {
+    //     this.fieldToAnimate = fieldName;
+    //     this.startNo = minValue;
+    //     this.endNo = maxValue;
+    //     this.calculateParametersAndStartAnimation(animationTime);
+    // }
 
     private stopAnimation = () => {
         if (this.animation) {
@@ -264,7 +261,7 @@ export class Pulse {
         this.restarting = true;
     }
 
-    private calculateParametersAndStartAnimation(animationTime: number) {
+    private calculateParametersAndStartAnimation = (animationTime: number) => {
         this.setRenderer(this.startNo);
         //generate step number here too
         let difference = Math.abs(this.startNo - this.endNo);
@@ -278,7 +275,7 @@ export class Pulse {
         this.startNo -= this.stepNumber * 2;
     }
 
-    private setRenderer(value: number) {
+    private setRenderer = (value: number) => {
         this.featureLayer.renderer = this.createRenderer(value);
     }
 
