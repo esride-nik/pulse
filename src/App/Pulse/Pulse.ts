@@ -37,7 +37,6 @@ export class Pulse {
     private animating: any;
     private orgEndNo: any;
     private orgStartNo: any;
-    private setlistFmConnector: SetlistFmConnector;
 
     public constructor(map: Map, mapView: MapView, config: any) {
         this.map = map;
@@ -48,12 +47,10 @@ export class Pulse {
     
     private initalise = () => {
 
-        this.setlistFmConnector = new SetlistFmConnector(this.config);
-
         //event listeners
         this.addEventListenerToDocumentElementValueById("play", "click", this.play);
         this.addEventListenerToDocumentElementValueById("stop", "click", this.stopAnimation);
-        this.addEventListenerToDocumentElementValueById("setlist", "click", this.setlistFmConnector.getDataAxios);
+
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
         this.addEventListenerToDocumentElementValueById("fs-url", "change", this.addFeatureLayer);
     

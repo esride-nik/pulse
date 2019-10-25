@@ -1,9 +1,8 @@
 import { observer, inject } from 'mobx-react';
 import { AppState } from '../States/AppState';
-import MapView from 'esri/views/MapView';
-import Map from 'esri/Map';
 import React from 'react';
 import { Pulse } from './Pulse';
+import { SetlistFmComponent } from './SetlistFmComponent';
 import { Container, Col, Row, Form, Card, ListGroup, Alert, Button, Tabs, Tab, Badge } from 'react-bootstrap';
 import { observable } from 'mobx';
 
@@ -18,9 +17,6 @@ export class PulseComponent extends React.Component<{
 }> {
     private pulse: Pulse;
 
-    @observable
-    private zoom: number;
-
     constructor(props) {
         super(props);
     }
@@ -31,24 +27,13 @@ export class PulseComponent extends React.Component<{
 
         if (map && mapView && !this.pulse) {
             this.pulse = new Pulse(map, mapView, config);
-            mapView.watch("zoom", ((e) => {
-                this.zoom = mapView.zoom;
-            }))
         }
 
         return (
             <Container>
                 <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
                     <Tab eventKey="setlistfm" title="Setlist.fm">
-                        <Row>
-                            <Form.Control type="text" id="artistname" placeholder="Enter an artist name" className="artistname"/>
-                        </Row>
-                        <Row>
-                            <Button variant="light" id="setlist">&#9636;</Button>
-                        </Row>
-                        <Row>
-                            <Badge variant="info" id="displayNow"></Badge>
-                        </Row>
+                        <SetlistFmComponent key={key}/>
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
