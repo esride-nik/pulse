@@ -219,12 +219,11 @@ export class Pulse {
         this.updateBrowserURL();
 
         //queries the current feature layer url and field to work out start and end frame.
-        this.getMaxMin();
+        this.getMaxMin(this.getDocumentElementValueById("selection"));
     }
 
-    private getMaxMin = () => {
+    private getMaxMin = (field: string) => {
         let flURL = this.getDocumentElementValueById("fs-url");
-        let field = this.getDocumentElementValueById("selection");
 
         axios.get(flURL + "/query", {
             params: {
@@ -236,19 +235,19 @@ export class Pulse {
           }).then((queryResponse: any) => {
             let responseData = queryResponse.data;
             this.fieldToAnimate = field;
-            this.startNumber(responseData.features[0].attributes.MinID);
+            this.startNo = responseData.features[0].attributes.MinID;
+            this.setRenderer(this.startNo);
             this.endNo = responseData.features[0].attributes.MaxID;
 
             //generate step number here too
-            let difference = Math.abs(responseData.features[0].attributes.MinID - responseData.features[0].attributes.MaxID);
+            let difference = Math.abs(this.startNo - this.endNo);
             let animationTime: number = Number.parseInt(this.getDocumentElementValueById("animation-time"));
             let differencePerSecond = difference / animationTime;
 
-            console.log(responseData.features[0].attributes.MinID, responseData.features[0].attributes.MaxID, difference);
+            console.log(this.startNo, this.endNo, difference);
 
             this.stepNumber = differencePerSecond / this.setIntervalSpeed;
-            this.startNo = responseData.features[0].attributes.MinID;
-            this.animation = this.animate(responseData.features[0].attributes.MinID);
+            this.animation = this.animate(this.startNo);
 
             //adding empty frames at the start and end for fade in/out
             this.orgEndNo = this.endNo;
@@ -262,7 +261,7 @@ export class Pulse {
         if (this.animation) {
             this.animation.remove();
         }
-        this.startNumber(0);
+        this.setRenderer(0);
         this.stepNumber = null;
         this.fieldToAnimate = null;
         this.startNo = null;
@@ -270,7 +269,7 @@ export class Pulse {
         this.restarting = true;
     }
 
-    private startNumber(value: number) {
+    private setRenderer(value: number) {
         this.featureLayer.renderer = this.createRenderer(value);
     }
 
@@ -293,7 +292,7 @@ export class Pulse {
 
             let displayNow: number = this.displayNow(currentFrame);
             this.getDocumentElementById("displayNow").innerHTML = selection + " " + displayNow.toString();
-            this.startNumber(currentFrame);
+            this.setRenderer(currentFrame);
 
             //animation loop.
             if (this.animating) {
