@@ -43,6 +43,24 @@ export class SetlistFmComponent extends React.Component<{
         }
         return query;
     }
+    
+
+    private reformatSetlistFmDate(setlistFmDate: string) {
+        return setlistFmDate.substr(6,4) + "-" + setlistFmDate.substr(3,2) + "-" + setlistFmDate.substr(0,2);
+    }
+
+    private setVenueGraphics = (graphics: Graphic[]) => {
+        let fieldName = this.props.appState.config.setlistFmConnector.setlistDateField;
+        this.props.appState.venueGraphics = graphics;
+        this.props.appState.fieldToAnimate = fieldName;
+        let fieldToAnimateValues = graphics.map((graphic: Graphic) => {
+            let eventDate = this.reformatSetlistFmDate(graphic.attributes[fieldName]);
+            console.log(eventDate, Date.parse(eventDate));
+            return Date.parse(eventDate);
+        });
+        this.props.appState.fieldToAnimateMinValue = Math.min(...fieldToAnimateValues);
+        this.props.appState.fieldToAnimateMaxValue = Math.max(...fieldToAnimateValues);
+    }
 
     public querySetlists = () => {
         const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;
@@ -85,7 +103,7 @@ export class SetlistFmComponent extends React.Component<{
                         }
                     }));
                 });
-                this.props.appState.venueGraphics = graphics;
+                this.setVenueGraphics(graphics);
             }
         });
     }
@@ -98,9 +116,6 @@ export class SetlistFmComponent extends React.Component<{
                 </Row>
                 <Row>
                     <Button variant="light" id="setlist" onClick={this.querySetlists}>&#9636;</Button>
-                </Row>
-                <Row>
-                    <Badge variant="info" id="displayNow"></Badge>
                 </Row>
             </Container>
         );

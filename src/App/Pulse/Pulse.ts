@@ -219,42 +219,37 @@ export class Pulse {
         this.updateBrowserURL();
 
         //queries the current feature layer url and field to work out start and end frame.
-        this.getMaxMin(this.getDocumentElementValueById("selection"));
+        this.fieldToAnimate = this.getDocumentElementValueById("selection");
+        this.getMaxMinFromFeatureLayer();
     }
 
-    private getMaxMin = (field: string) => {
+    private getMaxMinFromFeatureLayer = () => {
         let flURL = this.getDocumentElementValueById("fs-url");
 
         axios.get(flURL + "/query", {
             params: {
                 'f': 'pjson',
-                'outStatistics': '[{"statisticType":"min","onStatisticField":"' + field +
+                'outStatistics': '[{"statisticType":"min","onStatisticField":"' + this.fieldToAnimate +
                     '", "outStatisticFieldName":"MinID"},{"statisticType":"max","onStatisticField":"' +
-                    field + '", "outStatisticFieldName":"MaxID"}]'
+                    this.fieldToAnimate + '", "outStatisticFieldName":"MaxID"}]'
             }
           }).then((queryResponse: any) => {
             let responseData = queryResponse.data;
-            this.fieldToAnimate = field;
             this.startNo = responseData.features[0].attributes.MinID;
-            this.setRenderer(this.startNo);
             this.endNo = responseData.features[0].attributes.MaxID;
 
-            //generate step number here too
-            let difference = Math.abs(this.startNo - this.endNo);
-            let animationTime: number = Number.parseInt(this.getDocumentElementValueById("animation-time"));
-            let differencePerSecond = difference / animationTime;
-
-            console.log(this.startNo, this.endNo, difference);
-
-            this.stepNumber = differencePerSecond / this.setIntervalSpeed;
-            this.animation = this.animate(this.startNo);
-
-            //adding empty frames at the start and end for fade in/out
-            this.orgEndNo = this.endNo;
-            this.orgStartNo = this.startNo;
-            this.endNo += this.stepNumber * 40;
-            this.startNo -= this.stepNumber * 2;
+            this.calculateParametersAndStartAnimation(Number.parseInt(this.getDocumentElementValueById("animation-time")));
         });
+    }
+
+    private getMaxMinFromGraphicLayer = () => {
+        // this.fieldToAnimate
+        
+        // let responseData = queryResponse.data;
+        // this.startNo = responseData.features[0].attributes.MinID;
+        // this.endNo = responseData.features[0].attributes.MaxID;
+
+        this.calculateParametersAndStartAnimation(Number.parseInt(this.getDocumentElementValueById("animation-time")));
     }
 
     private stopAnimation = () => {
@@ -267,6 +262,20 @@ export class Pulse {
         this.startNo = null;
         this.endNo = null
         this.restarting = true;
+    }
+
+    private calculateParametersAndStartAnimation(animationTime: number) {
+        this.setRenderer(this.startNo);
+        //generate step number here too
+        let difference = Math.abs(this.startNo - this.endNo);
+        let differencePerSecond = difference / animationTime;
+        this.stepNumber = differencePerSecond / this.setIntervalSpeed;
+        this.animation = this.animate(this.startNo);
+        //adding empty frames at the start and end for fade in/out
+        this.orgEndNo = this.endNo;
+        this.orgStartNo = this.startNo;
+        this.endNo += this.stepNumber * 40;
+        this.startNo -= this.stepNumber * 2;
     }
 
     private setRenderer(value: number) {

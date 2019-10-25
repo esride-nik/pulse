@@ -63,6 +63,8 @@ export class MapComponent extends React.Component<{
 
     public render() {
         if (this.props.appState.venueGraphics && this.props.appState.venueGraphics.length>0) {
+            console.log("MapComponent adding Graphics", this.props.appState.venueGraphics);
+
             let venueGraphicsLayer = new GraphicsLayer({
                 id: "venueFeatures",
                 title: "Venues"
@@ -73,7 +75,8 @@ export class MapComponent extends React.Component<{
                 fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
             });
             venueGraphicsLayer.fullExtent = fullExtent;
-            this.map.remove(this.map.findLayerById("venueFeatures"));
+            // this.map.remove(this.map.findLayerById("venueFeatures"));
+            this.map.removeAll();
             this.map.add(venueGraphicsLayer);
             this.mapView.goTo(venueGraphicsLayer.fullExtent);
         }

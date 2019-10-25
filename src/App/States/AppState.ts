@@ -30,6 +30,15 @@ export class AppState {
     @observable
     public venueGraphics: Graphic[];
 
+    @observable
+    public fieldToAnimate: string;
+
+    @observable
+    public fieldToAnimateMinValue: number;
+
+    @observable
+    public fieldToAnimateMaxValue: number;
+
     public config: any;
 
     constructor(lang: any, config: any) {

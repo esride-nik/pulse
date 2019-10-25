@@ -52,11 +52,9 @@ export class PulseComponent extends React.Component<{
                             <Button variant="light" id="play">&#9658;</Button>
                             <Button variant="light" id="stop">&#9632;</Button>
                         </Row>
-                        <Row>
-                            <Badge variant="info" id="displayNow"></Badge>
-                        </Row>
                     </Tab>
                 </Tabs>
+                <Badge variant="info" id="displayNow"></Badge>
             </Container>
         );
     }
