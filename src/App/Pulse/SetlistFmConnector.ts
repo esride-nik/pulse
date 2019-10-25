@@ -1,5 +1,5 @@
 import axios from 'axios';
-import esriRequest from "esri/request";
+import { SetlistFmQuery } from './Interfaces';
 
 export class SetlistFmConnector {
 
@@ -9,9 +9,11 @@ export class SetlistFmConnector {
         this.config = config;
     }
 
-    public getDataAxios = () => {
+    public querySetlistFmData = (query: SetlistFmQuery) => {
         const { apiKey, baseUrl, searchArtist } = this.config;
-        let url = baseUrl + searchArtist + "black%20peaks";
+        console.log("querySetlistFmData", query);
+
+        let url = baseUrl + searchArtist + query.artist;
         let options = 
             { 
                 headers: {
