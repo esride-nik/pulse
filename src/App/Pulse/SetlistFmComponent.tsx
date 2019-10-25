@@ -93,17 +93,21 @@ export class SetlistFmComponent extends React.Component<{
                     }
                     graphics.push(new Graphic({
                         attributes: attributes,
-                        geometry: venueLocation,
-                        symbol: {
-                            type: "picture-marker",
-                            url:
-                              "https://arcgis.github.io/arcgis-samples-javascript/sample-data/cat3.png",
-                            width: 46,
-                            height: 46
-                        }
+                        geometry: venueLocation
+                        // ,
+                        // symbol: {
+                        //     type: "picture-marker",
+                        //     url:
+                        //       "https://arcgis.github.io/arcgis-samples-javascript/sample-data/cat3.png",
+                        //     width: 46,
+                        //     height: 46
+                        // }
                     }));
                 });
                 this.props.appState.venueGraphics = graphics;
+                let eventDates: number[] = graphics.map((graphic: Graphic) => graphic.attributes.eventDate);
+                this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
+                this.props.appState.fieldToAnimateMaxValue = Math.max(...eventDates);
                 this.props.appState.fieldToAnimate = "eventDate";
             }
         });

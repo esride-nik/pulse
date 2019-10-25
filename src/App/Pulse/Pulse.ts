@@ -37,6 +37,14 @@ export class Pulse {
         this.config = config;
         this.initalise();
     }
+
+    public setFeatureLayer(featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) {
+        this.featureLayer = featureLayer;
+        this.fieldToAnimate = fieldToAnimate;
+        this.startNo = fieldToAnimateMinValue;
+        this.endNo = fieldToAnimateMaxValue;
+        this.symbolSwitcher(featureLayer.geometryType);
+    }
     
     private initalise = () => {
 
@@ -46,6 +54,7 @@ export class Pulse {
 
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
         this.addEventListenerToDocumentElementValueById("fs-url", "change", this.addFeatureLayer);
+        this.addEventListenerToDocumentElementValueById("selection", "change", this.changeFieldSelection)
     
         //check URL for paramaters, if there's some. Add it in.
         var browserURL = window.location.search
@@ -102,14 +111,13 @@ export class Pulse {
 
     //this generates a new, sharable url link.
     private updateBrowserURL() {
-        history.pushState({
-            id: 'homepage'
-        }, 'Home', '?' + this.getDocumentElementValueById("fs-url") + ',' + this.getDocumentElementValueById("selection") + ',' + this.getDocumentElementValueById("animation-time") + ',' + this.mapLongLatZoom);
+        // history.pushState({
+        //     id: 'homepage'
+        // }, 'Home', '?' + this.getDocumentElementValueById("fs-url") + ',' + this.getDocumentElementValueById("selection") + ',' + this.getDocumentElementValueById("animation-time") + ',' + this.mapLongLatZoom);
     }
 
     //when map moves, update url.
     private updateMapLongLat = () => {
-        // ToDo: What to do with this?
         // if (this.mapView && this.mapView.center) {
         //     this.mapLongLatZoom = [this.mapView.center.longitude, this.mapView.center.latitude, this.mapView.zoom];
         // }
@@ -139,7 +147,6 @@ export class Pulse {
             this.map.remove(this.featureLayer);
             this.getDocumentElementById("fs-url").style.borderBottomColor = "red";
         }
-
     }
 
     //populating selection drop down based on featurelayer.
@@ -218,6 +225,10 @@ export class Pulse {
         //update with changed values.
         this.updateBrowserURL();
 
+        this.calculateParametersAndStartAnimation(10); //Number.parseInt(this.getDocumentElementValueById("animation-time")));
+    }
+
+    private changeFieldSelection = () => {
         //queries the current feature layer url and field to work out start and end frame.
         this.fieldToAnimate = this.getDocumentElementValueById("selection");
         this.getMaxMinFromFeatureLayer();
@@ -237,17 +248,8 @@ export class Pulse {
             let responseData = queryResponse.data;
             this.startNo = responseData.features[0].attributes.MinID;
             this.endNo = responseData.features[0].attributes.MaxID;
-
-            this.calculateParametersAndStartAnimation(Number.parseInt(this.getDocumentElementValueById("animation-time")));
         });
     }
-
-    // public setMinMaxFromGraphicsLayer = (fieldName: string, minValue: number, maxValue: number, animationTime: number) => {
-    //     this.fieldToAnimate = fieldName;
-    //     this.startNo = minValue;
-    //     this.endNo = maxValue;
-    //     this.calculateParametersAndStartAnimation(animationTime);
-    // }
 
     private stopAnimation = () => {
         if (this.animation) {
@@ -255,9 +257,9 @@ export class Pulse {
         }
         this.setRenderer(0);
         this.stepNumber = null;
-        this.fieldToAnimate = null;
-        this.startNo = null;
-        this.endNo = null
+        // this.fieldToAnimate = null;
+        // this.startNo = null;
+        // this.endNo = null
         this.restarting = true;
     }
 
@@ -276,7 +278,20 @@ export class Pulse {
     }
 
     private setRenderer = (value: number) => {
-        this.featureLayer.renderer = this.createRenderer(value);
+        this.featureLayer.renderer = {
+            type: "simple",  // autocasts as new SimpleRenderer()
+            symbol: {
+              type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+              size: 6,
+              color: "black",
+              outline: {  // autocasts as new SimpleLineSymbol()
+                width: 0.5,
+                color: "white"
+              }
+            }
+          };
+        
+        //this.createRenderer(value);
     }
 
     private animate(startValue: number) {
@@ -335,7 +350,7 @@ export class Pulse {
     private symbolSwitcher(geometryType) {
         //Depending on the feature layer currently added, the symbology will change here.
         //Supporting points, lines and polygons.
-        if (geometryType === "esriGeometryPoint") {
+        if (geometryType === "esriGeometryPoint" || "point") {
             this.newSymbol = {
                 type: "picture-marker",
                 url: "./images/PointIconImages/2.png",

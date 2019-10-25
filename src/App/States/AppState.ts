@@ -2,6 +2,7 @@ import { observable, computed } from 'mobx'
 import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
 import Graphic from 'esri/Graphic';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 
 export class AppState {
 
@@ -38,6 +39,9 @@ export class AppState {
 
     @observable
     public fieldToAnimateMaxValue: number;
+
+    @observable
+    public pulseFeatureLayer: FeatureLayer;
 
     public config: any;
 
