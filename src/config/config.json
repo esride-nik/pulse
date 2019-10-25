@@ -1,3 +1,8 @@
 {
-    "defaultService": "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0"
+    "defaultService": "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0",
+    "setlistFm": {
+        "baseUrl": "https://api.setlist.fm/rest/1.0",
+        "apiKey": "7_Q_PB-S4jb5GoJjH2a71IPw9CtiZLi1GM0-",
+        "searchArtist": "/search/artists?artistName="
+    }
 }
