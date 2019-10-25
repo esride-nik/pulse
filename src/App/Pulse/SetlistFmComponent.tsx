@@ -22,11 +22,17 @@ export class SetlistFmComponent extends React.Component<{
         this.setlistFmConnector = new SetlistFmConnector(config.setlistFm);
     }
 
+    private handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            this.setlistFmConnector.getDataAxios(e);
+        }
+      }
+
     public render() {
         return (
             <Container>
                 <Row>
-                    <Form.Control type="text" id="artistname" placeholder="Enter an artist name" className="artistname"/>
+                    <Form.Control type="text" id="artistname" placeholder="Enter an artist name" className="artistname" onKeyDown={this.handleKeyDown}/>
                 </Row>
                 <Row>
                     <Button variant="light" id="setlist" onClick={this.setlistFmConnector.getDataAxios}>&#9636;</Button>
