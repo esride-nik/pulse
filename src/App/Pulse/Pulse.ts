@@ -109,10 +109,11 @@ export class Pulse {
 
     //when map moves, update url.
     private updateMapLongLat = () => {
-        if (this.mapView && this.mapView.center) {
-            this.mapLongLatZoom = [this.mapView.center.longitude, this.mapView.center.latitude, this.mapView.zoom];
-        }
-        this.updateBrowserURL();
+        // ToDo: What to do with this?
+        // if (this.mapView && this.mapView.center) {
+        //     this.mapLongLatZoom = [this.mapView.center.longitude, this.mapView.center.latitude, this.mapView.zoom];
+        // }
+        // this.updateBrowserURL();
     }
 
     //adds the feature layer to the map.
