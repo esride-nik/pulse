@@ -3,11 +3,13 @@ import { AppState } from '../States/AppState';
 import React from 'react';
 import { Container, Col, Row, Form, Card, ListGroup, Alert, Button, Tabs, Tab, Badge } from 'react-bootstrap';
 import { observable } from 'mobx';
-import { SetlistFmConnector } from "./SetlistFmConnector";
 import { SetlistFmQuery } from './Interfaces';
+import axios from 'axios';
 
 // import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
 import './SetlistFmComponent.scss';
+import Graphic from 'esri/Graphic';
+import { Point } from 'esri/geometry';
 
 @inject('appState')
 @observer
@@ -20,30 +22,61 @@ export class SetlistFmComponent extends React.Component<{
 
     constructor(props) {
         super(props);
-        let { config } = props.appState;
-
         this.artist = React.createRef();
-
-        this.setlistFmConnector = new SetlistFmConnector(config.setlistFm);
     }
 
     componentDidMount() {
-        this.artist.current.value= "Snippet Upper Laser";
+        this.artist.current.value = "Black Peaks";
         this.artist.current.focus();
     }
 
     private handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            this.buildSetlistFmQuery();
+            this.querySetlists();
         }
     }
 
-    private buildSetlistFmQuery = () => {
+    private buildQuery = (): SetlistFmQuery => {
         let query: SetlistFmQuery = {};
         if (this.artist.current.value && this.artist.current.value.length>1) {
-            query.artist = this.artist.current.value;
+            query.artistName = this.artist.current.value;
         }
-        this.setlistFmConnector.querySetlistFmData(query);
+        return query;
+    }
+
+    public querySetlists = () => {
+        const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;
+
+        let query = this.buildQuery();
+
+        let url = baseUrl + setlists + query.artistName;
+        let options = 
+            { 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': apiKey
+                }
+            };
+
+        axios.get(url, options).then((response: any) => {
+            console.log("Setlists response", response.data);
+            this.props.appState.venueFeatures = [];
+            if (response.data && response.data.setlist) {
+                response.data.setlist.map((setlist: any) => {
+                    let venueLocation: Point;
+                    if (setlist.venue && setlist.venue.city && setlist.venue.city.coords) {
+                        venueLocation = new Point({
+                            x: setlist.venue.city.coords.long,
+                            y: setlist.venue.city.coords.lat
+                        });
+                    }
+                    this.props.appState.venueFeatures.push(new Graphic({
+                        attributes: setlist,
+                        geometry: venueLocation
+                    }));
+                });
+            }
+        });
     }
 
     public render() {
@@ -53,7 +86,7 @@ export class SetlistFmComponent extends React.Component<{
                     <Form.Control type="text" id="artist" placeholder="Enter an artist name" className="artist" onKeyDown={this.handleKeyDown} ref={this.artist}/>
                 </Row>
                 <Row>
-                    <Button variant="light" id="setlist" onClick={this.buildSetlistFmQuery}>&#9636;</Button>
+                    <Button variant="light" id="setlist" onClick={this.querySetlists}>&#9636;</Button>
                 </Row>
                 <Row>
                     <Badge variant="info" id="displayNow"></Badge>

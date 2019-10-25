@@ -1,15 +1,8 @@
 import Map = require("esri/Map");
 import MapView = require("esri/views/MapView");
 import FeatureLayer = require("esri/layers/FeatureLayer");
-import VectorTileLayer = require("esri/layers/VectorTileLayer");
-import SimpleLineSymbol = require("esri/symbols/SimpleLineSymbol");
-import watchUtils = require("esri/core/watchUtils");
-import webMercatorUtils = require("esri/geometry/support/webMercatorUtils");
 import Point = require("esri/geometry/Point");
-import dom = require("dojo/dom");
 import { Extent } from "esri/geometry";
-import { Renderer } from "esri/renderers";
-import { SetlistFmConnector } from './SetlistFmConnector';
 import axios from 'axios';
 
 export class Pulse {
@@ -82,8 +75,6 @@ export class Pulse {
                 zoom: this.mapLongLatZoom[2]
             })
         })
-        //once feature layer url has been set, now add it to the map.
-        this.addFeatureLayer();
     }
 
     private addEventListenerToDocumentElementValueById(elementId: string, eventName: string, eventListener: EventListener) {

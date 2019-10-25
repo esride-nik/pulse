@@ -1,6 +1,7 @@
 import { observable, computed } from 'mobx'
 import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
+import Graphic from 'esri/Graphic';
 
 export class AppState {
 
@@ -25,6 +26,9 @@ export class AppState {
 
     @observable
     public mapView: MapView;
+
+    @observable
+    public venueFeatures: Graphic[];
 
     public config: any;
 

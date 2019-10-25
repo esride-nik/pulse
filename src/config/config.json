@@ -1,8 +1,9 @@
 {
     "defaultService": "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0",
-    "setlistFm": {
+    "setlistFmConnector": {
         "baseUrl": "http://localhost:3000/",
         "apiKey": "7_Q_PB-S4jb5GoJjH2a71IPw9CtiZLi1GM0-",
-        "searchArtist": "artist?name="
+        "artists": "artists?artistName=",
+        "setlists": "setlists?artistName="
     }
 }

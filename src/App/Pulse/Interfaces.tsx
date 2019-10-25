@@ -1,3 +1,9 @@
 export interface SetlistFmQuery {
-    artist?: string;
+    artistName?: string;
+}
+
+export interface VenueAttributes {
+    venue?: {},
+    url?: string,
+    info?: string,
 }
