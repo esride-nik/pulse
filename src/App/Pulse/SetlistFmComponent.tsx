@@ -60,7 +60,6 @@ export class SetlistFmComponent extends React.Component<{
 
         axios.get(url, options).then((response: any) => {
             console.log("Setlists response", response.data);
-            this.props.appState.venueFeatures = [];
             if (response.data && response.data.setlist) {
                 let graphics: Graphic[] = [];
                 response.data.setlist.map((setlist: any) => {
@@ -86,7 +85,7 @@ export class SetlistFmComponent extends React.Component<{
                         }
                     }));
                 });
-                this.props.appState.venueFeatures = graphics;
+                this.props.appState.venueGraphics = graphics;
             }
         });
     }

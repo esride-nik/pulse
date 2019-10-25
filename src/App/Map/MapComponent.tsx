@@ -62,17 +62,15 @@ export class MapComponent extends React.Component<{
     }
 
     public render() {
-        console.log("Map Component", this.props.appState.venueFeatures);
-
-        if (this.props.appState.venueFeatures && this.props.appState.venueFeatures.length>0) {
+        if (this.props.appState.venueGraphics && this.props.appState.venueGraphics.length>0) {
             let venueGraphicsLayer = new GraphicsLayer({
                 id: "venueFeatures",
                 title: "Venues"
             });
             let fullExtent: Extent = new Extent();
-            this.props.appState.venueFeatures.map((venueFeature: Graphic) => {
-                venueGraphicsLayer.graphics.push(venueFeature);
-                fullExtent = this.extendPointLayerExtent(fullExtent, venueFeature.geometry);
+            this.props.appState.venueGraphics.map((venueGraphic: Graphic) => {
+                venueGraphicsLayer.graphics.push(venueGraphic);
+                fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
             });
             venueGraphicsLayer.fullExtent = fullExtent;
             this.map.remove(this.map.findLayerById("venueFeatures"));
