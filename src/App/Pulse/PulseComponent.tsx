@@ -13,6 +13,7 @@ import Extent from 'esri/geometry/Extent';
 import Graphic from 'esri/Graphic';
 import Geometry from 'esri/geometry/Geometry';
 import FeatureLayer from 'esri/layers/FeatureLayer';
+import Collection, { isCollection } from 'esri/core/Collection';
 
 @inject('appState')
 @observer
@@ -54,19 +55,26 @@ export class PulseComponent extends React.Component<{
     }
 
     private venueGraphicsToFeatureLayer() {
-        let { map, mapView } = this.props.appState;
         let fullExtent: Extent = new Extent();
         this.props.appState.venueGraphics.map((venueGraphic: Graphic) => {
             fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
         });
 
+        let graphicsCollection = new Collection();
+        graphicsCollection.addMany(this.props.appState.venueGraphics);
+
         const venuesFeatureLayer = new FeatureLayer({
             // create an instance of esri/layers/support/Field for each field object
 
             fields: [{
+                  name: "OBJECTID",
+                  alias: "objectId",
+                  type: "oid"
+            },
+            {
                 name: "eventDate",
                 alias: "eventDate",
-                type: "integer"
+                type: "long"
             },
             {
                 name: "id",
@@ -83,15 +91,26 @@ export class PulseComponent extends React.Component<{
                 alias: "url",
                 type: "string"
             }],
-            objectIdField: "ObjectID",
+            objectIdField: "OBJECTID",
             geometryType: "point",
             spatialReference: { wkid: 4326 },
-            source: this.props.appState.venueGraphics,  //  an array of graphics with geometry and attributes
+            source: graphicsCollection,  //  an array of graphics with geometry and attributes
                               // popupTemplate and symbol are not required in each feature
                               // since those are handled with the popupTemplate and
                               // renderer properties of the layer
             // popupTemplate: pTemplate,
-            // renderer: uvRenderer,  // UniqueValueRenderer based on `type` attribute
+            // renderer: {
+            //     type: "simple",
+            //     symbol: {
+            //         type: "text",
+            //         color: "#7A003C",
+            //         text: "\ue661",
+            //         font: {
+            //             size: 20,
+            //             family: "CalciteWebCoreIcons"
+            //         }
+            //     }
+            // },  // UniqueValueRenderer based on `type` attribute
             id: "venueFeatures",
             title: "Venues",
             fullExtent: fullExtent
@@ -100,9 +119,9 @@ export class PulseComponent extends React.Component<{
         if (this.pulse) {
             this.pulse.setFeatureLayer(venuesFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
         }
-        map.removeAll();
-        map.add(venuesFeatureLayer);
-        mapView.goTo(venuesFeatureLayer.fullExtent);
+        // map.removeAll();
+        // map.add(venuesFeatureLayer);
+        // mapView.goTo(venuesFeatureLayer.fullExtent);
     }
 
     public render() {

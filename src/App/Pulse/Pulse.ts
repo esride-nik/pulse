@@ -4,6 +4,7 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 import Point = require("esri/geometry/Point");
 import { Extent } from "esri/geometry";
 import axios from 'axios';
+import Query = require('esri/tasks/support/Query');
 
 export class Pulse {
     private mapLongLatZoom = [0, 0, 1] //default
@@ -40,6 +41,9 @@ export class Pulse {
 
     public setFeatureLayer(featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) {
         this.featureLayer = featureLayer;
+        this.map.removeAll();
+        this.map.add(featureLayer);
+        this.mapView.goTo(featureLayer.fullExtent);
         this.fieldToAnimate = fieldToAnimate;
         this.startNo = fieldToAnimateMinValue;
         this.endNo = fieldToAnimateMaxValue;
@@ -265,6 +269,7 @@ export class Pulse {
 
     private calculateParametersAndStartAnimation = (animationTime: number) => {
         this.setRenderer(this.startNo);
+
         //generate step number here too
         let difference = Math.abs(this.startNo - this.endNo);
         let differencePerSecond = difference / animationTime;
@@ -278,20 +283,20 @@ export class Pulse {
     }
 
     private setRenderer = (value: number) => {
-        this.featureLayer.renderer = {
-            type: "simple",  // autocasts as new SimpleRenderer()
-            symbol: {
-              type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
-              size: 6,
-              color: "black",
-              outline: {  // autocasts as new SimpleLineSymbol()
-                width: 0.5,
-                color: "white"
-              }
-            }
-          };
+        // this.featureLayer.renderer = {
+        //     type: "simple",  // autocasts as new SimpleRenderer()
+        //     symbol: {
+        //       type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+        //       size: 6,
+        //       color: "black",
+        //       outline: {  // autocasts as new SimpleLineSymbol()
+        //         width: 0.5,
+        //         color: "white"
+        //       }
+        //     }
+        //   };
         
-        //this.createRenderer(value);
+        this.createRenderer(value);
     }
 
     private animate(startValue: number) {

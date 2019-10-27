@@ -36,7 +36,7 @@ export class SetlistFmComponent extends React.Component<{
         }
     }
 
-    private buildQuery = (): SetlistFmQuery => {
+    private buildSetlistFmQuery = (): SetlistFmQuery => {
         let query: SetlistFmQuery = {};
         if (this.artist.current.value && this.artist.current.value.length>1) {
             query.artistName = this.artist.current.value;
@@ -52,7 +52,7 @@ export class SetlistFmComponent extends React.Component<{
     public querySetlists = () => {
         const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;
 
-        let query = this.buildQuery();
+        let query = this.buildSetlistFmQuery();
 
         let url = baseUrl + setlists + query.artistName;
         let options = 
@@ -63,6 +63,7 @@ export class SetlistFmComponent extends React.Component<{
                 }
             };
 
+        let objectId = 0;
         axios.get(url, options).then((response: any) => {
             console.log("Setlists response", response.data);
             if (response.data && response.data.setlist) {
@@ -79,17 +80,16 @@ export class SetlistFmComponent extends React.Component<{
                         });
                     }
 
-
-            // artist: {mbid: "3cd7b958-b101-49cc-98fe-4a9d99edb03e", name: "Black Peaks", sortName: "Black Peaks", disambiguation: "UK aggressive hardcore, post rock, formerly Shrine", url: "https://www.setlist.fm/setlists/black-peaks-6bd89236.html"}
-            // sets: {set: Array(2)}
-            // venue: {id: "3bd4b464", name: "Brighton Electric", city: {…}, url: "https://www.setlist.fm/venue/brighton-electric-brighton-england-3bd4b464.html"}
-
-
+                    let attInfo = "";
+                    if (setlist.info) {
+                        attInfo = setlist.info;
+                    }
                     let attributes = {
+                        "url": setlist.url,
+                        "OBJECTID": objectId,
                         "eventDate": Date.parse(this.reformatSetlistFmDate(setlist.eventDate)),
                         "id": setlist.id,
                         "info": setlist.info,
-                        "url": setlist.url
                     }
                     graphics.push(new Graphic({
                         attributes: attributes,
@@ -103,7 +103,9 @@ export class SetlistFmComponent extends React.Component<{
                         //     height: 46
                         // }
                     }));
+                    objectId++;
                 });
+                console.log(JSON.stringify(graphics));
                 this.props.appState.venueGraphics = graphics;
                 let eventDates: number[] = graphics.map((graphic: Graphic) => graphic.attributes.eventDate);
                 this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
