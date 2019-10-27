@@ -23,9 +23,53 @@ export class PulseComponent extends React.Component<{
 }> {
     private pulse: Pulse;
     map: Map;
+    selection: React.RefObject<unknown>;
+    fsurl: React.RefObject<unknown>;
+    animationTime: React.RefObject<unknown>;
 
     constructor(props) {
         super(props);
+        this.selection = React.createRef();
+        this.fsurl = React.createRef();
+        this.animationTime = React.createRef();
+    }
+
+    private play = () => {
+        //Stops any previously added animations in the frame
+        this.pulse.stopAnimation();
+
+        //There's an unknown issue caused by "ObjectID"
+        //This is currently a workaround for it.
+        if(this.selection.current.value === "OBJECTID"){
+            if (this.fsurl.current.value != "") {
+                this.pulse.featureLayer = new FeatureLayer({
+                    url: this.fsurl.current.value
+                });
+                this.map.removeAll()
+                this.map.add(this.pulse.featureLayer)
+            }
+        }
+
+        //update with changed values.
+        this.pulse.updateBrowserURL();
+
+        this.calculateParametersAndStartAnimation(this.animationTime.current.value);
+    }
+
+    private calculateParametersAndStartAnimation = (animationTime: number) => {
+        //generate step number here too
+        let difference = Math.abs(this.pulse.startNo - this.pulse.endNo);
+        let differencePerSecond = difference / animationTime;
+        this.pulse.stepNumber = differencePerSecond / this.pulse.setIntervalSpeed;
+        this.pulse.animation = this.animate(this.pulse.startNo);
+        
+        //adding empty frames at the start and end for fade in/out
+        this.pulse.orgEndNo = this.pulse.endNo;
+        this.pulse.orgStartNo = this.pulse.startNo;
+        this.pulse.endNo += this.pulse.stepNumber * 40;
+        this.pulse.startNo -= this.pulse.stepNumber * 2;
+
+        this.pulse.setRenderer(this.pulse.startNo);
     }
 
     private animate(startValue: number) {
@@ -78,84 +122,8 @@ export class PulseComponent extends React.Component<{
         return displayNow;
     }
 
-    private extendPointLayerExtent(extent: Extent, geometry: Geometry): Extent {
-        if (geometry.type=="point") {
-            if (extent.xmax==0 && extent.xmin==0 && extent.ymax==0 && extent.ymin==0) {
-                extent.xmax = geometry.x;
-                extent.xmin = geometry.x;
-                extent.ymax = geometry.y;
-                extent.ymin = geometry.y;
-            }
-            else {
-                if (geometry.y < extent.ymin) {
-                    extent.ymin = geometry.y;
-                }
-                if (geometry.y > extent.ymax) {
-                    extent.ymax = geometry.y;
-                }
-                if (geometry.x < extent.xmin) {
-                    extent.xmin = geometry.x;
-                }
-                if (geometry.x > extent.xmax) {
-                    extent.xmax = geometry.x;
-                }
-            }
-        }
-        return extent;
-    }
-
-    private venueGraphicsToFeatureLayer() {
-        let fullExtent: Extent = new Extent();
-        this.props.appState.venueGraphics.map((venueGraphic: Graphic) => {
-            fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
-        });
-
-        let graphicsCollection = new Collection();
-        graphicsCollection.addMany(this.props.appState.venueGraphics);
-
-        const venuesFeatureLayer = new FeatureLayer({
-            // create an instance of esri/layers/support/Field for each field object
-
-            fields: [{
-                  name: "OBJECTID",
-                  alias: "objectId",
-                  type: "oid"
-            },
-            {
-                name: "eventDate",
-                alias: "eventDate",
-                type: "long"
-            },
-            {
-                name: "id",
-                alias: "id",
-                type: "string"
-            },
-            {
-                name: "info",
-                alias: "info",
-                type: "string"
-            },
-            {
-                name: "url",
-                alias: "url",
-                type: "string"
-            }],
-            popupTemplate: {
-              content: "<a href='{url}'></a>"
-            },
-            objectIdField: "OBJECTID",
-            geometryType: "point",
-            spatialReference: { wkid: 4326 },
-            source: graphicsCollection,
-            id: "venueFeatures",
-            title: "Venues",
-            fullExtent: fullExtent
-        });
-
-        if (this.pulse) {
-            this.pulse.setFeatureLayer(venuesFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
-        }
+    private setPulseFeatureLayerUnchanged() {
+        this.props.appState.pulseFeatureLayerChanged = false;
     }
 
     public render() {
@@ -165,8 +133,11 @@ export class PulseComponent extends React.Component<{
         if (map && mapView && !this.pulse) {
             this.pulse = new Pulse(map, mapView, config);
         }
-        if (this.props.appState.venueGraphics && this.props.appState.venueGraphics.length>0 && this.props.appState.fieldToAnimate && this.props.appState.fieldToAnimateMinValue && this.props.appState.fieldToAnimateMaxValue) {
-            this.venueGraphicsToFeatureLayer();
+        if (this.props.appState.pulseFeatureLayerChanged) {
+            if (this.pulse) {
+                this.pulse.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
+            }
+            this.setPulseFeatureLayerUnchanged();
         }
 
         return (
@@ -177,20 +148,21 @@ export class PulseComponent extends React.Component<{
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
-                            <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url"/>
+                            <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url" ref={this.fsurl}/>
                             <div id="feature-layer-name">...</div>
                         </Row>
                         <Row>
                             Select attribute to animate
-                            <Form.Control as="select" id="selection">
+                            <Form.Control as="select" id="selection" ref={this.selection}>
                                 <option></option>
                             </Form.Control>
-                            for
-                            <Form.Control type="text" id="animation-time" placeholder="Enter duration in seconds here" className="animation-time"/> seconds
                         </Row>
                     </Tab>
                 </Tabs>
-                <Button variant="light" id="play">&#9658;</Button>
+
+                Animation time <Form.Control type="text" id="animation-time" placeholder="Enter duration in seconds here" className="animation-time" ref={this.animationTime}/> seconds
+
+                <Button variant="light" id="play" onClick={this.play}>&#9658;</Button>
                 <Button variant="light" id="stop">&#9632;</Button>
                 <Badge variant="info" id="displayNow">{displayNow}</Badge>
             </Container>

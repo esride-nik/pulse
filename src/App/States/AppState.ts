@@ -46,6 +46,9 @@ export class AppState {
     @observable
     public pulseFeatureLayer: FeatureLayer;
 
+    @observable
+    public pulseFeatureLayerChanged: boolean;
+
     public config: any;
 
     constructor(lang: any, config: any) {

@@ -9,7 +9,9 @@ import axios from 'axios';
 // import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
 import './SetlistFmComponent.scss';
 import Graphic from 'esri/Graphic';
-import { Point } from 'esri/geometry';
+import { Point, Extent, Geometry } from 'esri/geometry';
+import Collection from 'esri/core/Collection';
+import FeatureLayer from 'esri/layers/FeatureLayer';
 
 @inject('appState')
 @observer
@@ -26,6 +28,7 @@ export class SetlistFmComponent extends React.Component<{
     }
 
     componentDidMount() {
+        // ToDo: get recent artists from setlist.fm and randomly select one as default value?
         this.artist.current.value = "Black Peaks";
         this.artist.current.focus();
     }
@@ -92,13 +95,101 @@ export class SetlistFmComponent extends React.Component<{
                     }));
                     objectId++;
                 });
-                this.props.appState.venueGraphics = graphics;
-                let eventDates: number[] = graphics.map((graphic: Graphic) => graphic.attributes.eventDate);
-                this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
-                this.props.appState.fieldToAnimateMaxValue = Math.max(...eventDates);
-                this.props.appState.fieldToAnimate = "eventDate";
+                this.venueGraphicsToFeatureLayer(graphics);
             }
         });
+    }
+
+
+    private extendPointLayerExtent(extent: Extent, geometry: Geometry): Extent {
+        if (geometry.type=="point") {
+            if (extent.xmax==0 && extent.xmin==0 && extent.ymax==0 && extent.ymin==0) {
+                extent.xmax = geometry.x;
+                extent.xmin = geometry.x;
+                extent.ymax = geometry.y;
+                extent.ymin = geometry.y;
+            }
+            else {
+                if (geometry.y < extent.ymin) {
+                    extent.ymin = geometry.y;
+                }
+                if (geometry.y > extent.ymax) {
+                    extent.ymax = geometry.y;
+                }
+                if (geometry.x < extent.xmin) {
+                    extent.xmin = geometry.x;
+                }
+                if (geometry.x > extent.xmax) {
+                    extent.xmax = geometry.x;
+                }
+            }
+        }
+        return extent;
+    }
+
+    private venueGraphicsToFeatureLayer(venueGraphics: Graphic[]) {
+        let fullExtent: Extent = new Extent();
+        venueGraphics.map((venueGraphic: Graphic) => {
+            fullExtent = this.extendPointLayerExtent(fullExtent, venueGraphic.geometry);
+        });
+
+        let graphicsCollection = new Collection();
+        graphicsCollection.addMany(this.props.appState.venueGraphics);
+
+        const venuesFeatureLayer = new FeatureLayer({
+            // create an instance of esri/layers/support/Field for each field object
+
+            fields: [{
+                  name: "OBJECTID",
+                  alias: "objectId",
+                  type: "oid"
+            },
+            {
+                name: "eventDate",
+                alias: "eventDate",
+                type: "long"
+            },
+            {
+                name: "id",
+                alias: "id",
+                type: "string"
+            },
+            {
+                name: "info",
+                alias: "info",
+                type: "string"
+            },
+            {
+                name: "url",
+                alias: "url",
+                type: "string"
+            }],
+            popupTemplate: {
+              content: "<a href='{url}'></a>"
+            },
+            objectIdField: "OBJECTID",
+            geometryType: "point",
+            spatialReference: { wkid: 4326 },
+            source: graphicsCollection,
+            id: "venueFeatures",
+            title: "Venues",
+            fullExtent: fullExtent
+        });
+
+
+        // HIER WEITER / PROCEED HERE: Pulse.featureLayer shall always come from appState. Only this way we can avoid setting it manually! We don't want a Pulse instance here. => Merge Pulse with PulseComponent
+        // pass setter through state!?
+        this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
+        this.props.appState.pulseFeatureLayerChanged = true;
+
+        let eventDates: number[] = venueGraphics.map((graphic: Graphic) => graphic.attributes.eventDate);
+        this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
+        this.props.appState.fieldToAnimateMaxValue = Math.max(...eventDates);
+        this.props.appState.fieldToAnimate = "eventDate";
+
+        // if (this.pulse) {
+        //     this.pulse.setFeatureLayer(venuesFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
+        // }
     }
 
     public render() {

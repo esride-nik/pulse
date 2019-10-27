@@ -19,7 +19,7 @@ export class Pulse {
     private overRidingField: any; //casts url field as no.1 selection in attribute selector
     private mapView: MapView;
     private map: Map;
-    private featureLayer: FeatureLayer;
+    public featureLayer: FeatureLayer;
     private select: HTMLElement | null;
 
     //for recasting global symbols
@@ -27,7 +27,7 @@ export class Pulse {
     private newSymbol: Symbol;
     private newType: any;
     private config: any;
-    private animation: { remove: () => void; };
+    public animation: { remove: () => void; };
 
     public animating: any;
     public orgEndNo: any;
@@ -54,7 +54,6 @@ export class Pulse {
     private initalise = () => {
 
         //event listeners
-        this.addEventListenerToDocumentElementValueById("play", "click", this.play);
         this.addEventListenerToDocumentElementValueById("stop", "click", this.stopAnimation);
 
         this.addEventListenerToDocumentElementValueById("fs-url", "blur", this.addFeatureLayer);
@@ -115,7 +114,7 @@ export class Pulse {
     }
 
     //this generates a new, sharable url link.
-    private updateBrowserURL() {
+    public updateBrowserURL() {
         // history.pushState({
         //     id: 'homepage'
         // }, 'Home', '?' + this.getDocumentElementValueById("fs-url") + ',' + this.getDocumentElementValueById("selection") + ',' + this.getDocumentElementValueById("animation-time") + ',' + this.mapLongLatZoom);
@@ -213,27 +212,27 @@ export class Pulse {
         }
     }
 
-    private play = () => {
-        //Stops any previously added animations in the frame
-        this.stopAnimation();
+    // private play = () => {
+    //     //Stops any previously added animations in the frame
+    //     this.stopAnimation();
 
-        //There's an unknown issue caused by "ObjectID"
-        //This is currently a workaround for it.
-        if(this.getDocumentElementValueById("selection") === "OBJECTID"){
-            if (this.getDocumentElementValueById("fs-url") != "") {
-                this.featureLayer = new FeatureLayer({
-                    url: this.getDocumentElementValueById("fs-url")
-                });
-                this.map.removeAll()
-                this.map.add(this.featureLayer)
-            }
-        }
+    //     //There's an unknown issue caused by "ObjectID"
+    //     //This is currently a workaround for it.
+    //     if(this.getDocumentElementValueById("selection") === "OBJECTID"){
+    //         if (this.getDocumentElementValueById("fs-url") != "") {
+    //             this.featureLayer = new FeatureLayer({
+    //                 url: this.getDocumentElementValueById("fs-url")
+    //             });
+    //             this.map.removeAll()
+    //             this.map.add(this.featureLayer)
+    //         }
+    //     }
 
-        //update with changed values.
-        this.updateBrowserURL();
+    //     //update with changed values.
+    //     this.updateBrowserURL();
 
-        this.calculateParametersAndStartAnimation(10); //Number.parseInt(this.getDocumentElementValueById("animation-time")));
-    }
+    //     this.calculateParametersAndStartAnimation(10); //Number.parseInt(this.getDocumentElementValueById("animation-time")));
+    // }
 
     private changeFieldSelection = () => {
         //queries the current feature layer url and field to work out start and end frame.
@@ -255,7 +254,7 @@ export class Pulse {
         });
     }
 
-    private stopAnimation = () => {
+    public stopAnimation = () => {
         if (this.animation) {
             this.animation.remove();
         }
@@ -264,21 +263,21 @@ export class Pulse {
         this.restarting = true;
     }
 
-    private calculateParametersAndStartAnimation = (animationTime: number) => {
-        //generate step number here too
-        let difference = Math.abs(this.startNo - this.endNo);
-        let differencePerSecond = difference / animationTime;
-        this.stepNumber = differencePerSecond / this.setIntervalSpeed;
-        this.animation = this.animate(this.startNo);
+    // private calculateParametersAndStartAnimation = (animationTime: number) => {
+    //     //generate step number here too
+    //     let difference = Math.abs(this.startNo - this.endNo);
+    //     let differencePerSecond = difference / animationTime;
+    //     this.stepNumber = differencePerSecond / this.setIntervalSpeed;
+    //     this.animation = this.animate(this.startNo);
         
-        //adding empty frames at the start and end for fade in/out
-        this.orgEndNo = this.endNo;
-        this.orgStartNo = this.startNo;
-        this.endNo += this.stepNumber * 40;
-        this.startNo -= this.stepNumber * 2;
+    //     //adding empty frames at the start and end for fade in/out
+    //     this.orgEndNo = this.endNo;
+    //     this.orgStartNo = this.startNo;
+    //     this.endNo += this.stepNumber * 40;
+    //     this.startNo -= this.stepNumber * 2;
 
-        this.setRenderer(this.startNo);
-    }
+    //     this.setRenderer(this.startNo);
+    // }
 
     public setRenderer = (value: number) => {
         this.featureLayer.renderer = this.createRenderer(value);
