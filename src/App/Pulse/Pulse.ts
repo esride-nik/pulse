@@ -5,6 +5,7 @@ import Point = require("esri/geometry/Point");
 import { Extent } from "esri/geometry";
 import axios from 'axios';
 import Query = require('esri/tasks/support/Query');
+import { Renderer, ClassBreaksRenderer } from 'esri/renderers';
 
 export class Pulse {
     private mapLongLatZoom = [0, 0, 1] //default
@@ -268,8 +269,6 @@ export class Pulse {
     }
 
     private calculateParametersAndStartAnimation = (animationTime: number) => {
-        this.setRenderer(this.startNo);
-
         //generate step number here too
         let difference = Math.abs(this.startNo - this.endNo);
         let differencePerSecond = difference / animationTime;
@@ -280,23 +279,12 @@ export class Pulse {
         this.orgStartNo = this.startNo;
         this.endNo += this.stepNumber * 40;
         this.startNo -= this.stepNumber * 2;
+
+        this.setRenderer(this.startNo);
     }
 
     private setRenderer = (value: number) => {
-        // this.featureLayer.renderer = {
-        //     type: "simple",  // autocasts as new SimpleRenderer()
-        //     symbol: {
-        //       type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
-        //       size: 6,
-        //       color: "black",
-        //       outline: {  // autocasts as new SimpleLineSymbol()
-        //         width: 0.5,
-        //         color: "white"
-        //       }
-        //     }
-        //   };
-        
-        this.createRenderer(value);
+        this.featureLayer.renderer = this.createRenderer(value);
     }
 
     private animate(startValue: number) {
@@ -387,7 +375,7 @@ export class Pulse {
         }
     }
 
-    private createRenderer(now: number): any {
+    private createRenderer(now: number): Renderer {
         let renderer = {
             type: this.newType,
             symbol: this.newSymbol,
@@ -420,6 +408,6 @@ export class Pulse {
                 ]
             }]
         };
-        return renderer;
+        return renderer as unknown as Renderer;
     }
 }
