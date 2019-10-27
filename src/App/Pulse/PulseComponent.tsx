@@ -91,26 +91,13 @@ export class PulseComponent extends React.Component<{
                 alias: "url",
                 type: "string"
             }],
+            popupTemplate: {
+              content: "<a href='{url}'></a>"
+            },
             objectIdField: "OBJECTID",
             geometryType: "point",
             spatialReference: { wkid: 4326 },
-            source: graphicsCollection,  //  an array of graphics with geometry and attributes
-                              // popupTemplate and symbol are not required in each feature
-                              // since those are handled with the popupTemplate and
-                              // renderer properties of the layer
-            // popupTemplate: pTemplate,
-            // renderer: {
-            //     type: "simple",
-            //     symbol: {
-            //         type: "text",
-            //         color: "#7A003C",
-            //         text: "\ue661",
-            //         font: {
-            //             size: 20,
-            //             family: "CalciteWebCoreIcons"
-            //         }
-            //     }
-            // },  // UniqueValueRenderer based on `type` attribute
+            source: graphicsCollection,
             id: "venueFeatures",
             title: "Venues",
             fullExtent: fullExtent
@@ -119,9 +106,6 @@ export class PulseComponent extends React.Component<{
         if (this.pulse) {
             this.pulse.setFeatureLayer(venuesFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
         }
-        // map.removeAll();
-        // map.add(venuesFeatureLayer);
-        // mapView.goTo(venuesFeatureLayer.fullExtent);
     }
 
     public render() {
@@ -132,7 +116,6 @@ export class PulseComponent extends React.Component<{
             this.pulse = new Pulse(map, mapView, config);
         }
         if (this.props.appState.venueGraphics && this.props.appState.venueGraphics.length>0 && this.props.appState.fieldToAnimate && this.props.appState.fieldToAnimateMinValue && this.props.appState.fieldToAnimateMaxValue) {
-            console.log("venueGraphicsToFeatureLayer");
             this.venueGraphicsToFeatureLayer();
         }
 

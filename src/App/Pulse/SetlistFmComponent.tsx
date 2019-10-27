@@ -65,7 +65,6 @@ export class SetlistFmComponent extends React.Component<{
 
         let objectId = 0;
         axios.get(url, options).then((response: any) => {
-            console.log("Setlists response", response.data);
             if (response.data && response.data.setlist) {
                 let graphics: Graphic[] = [];
                 response.data.setlist.map((setlist: any) => {
@@ -80,32 +79,20 @@ export class SetlistFmComponent extends React.Component<{
                         });
                     }
 
-                    let attInfo = "";
-                    if (setlist.info) {
-                        attInfo = setlist.info;
-                    }
+                    let attInfo = setlist.info ? setlist.info : "";
                     let attributes = {
                         "url": setlist.url,
                         "OBJECTID": objectId,
                         "eventDate": Date.parse(this.reformatSetlistFmDate(setlist.eventDate)),
                         "id": setlist.id,
-                        "info": setlist.info,
+                        "info": attInfo,
                     }
                     graphics.push(new Graphic({
                         attributes: attributes,
                         geometry: venueLocation
-                        // ,
-                        // symbol: {
-                        //     type: "picture-marker",
-                        //     url:
-                        //       "https://arcgis.github.io/arcgis-samples-javascript/sample-data/cat3.png",
-                        //     width: 46,
-                        //     height: 46
-                        // }
                     }));
                     objectId++;
                 });
-                console.log(JSON.stringify(graphics));
                 this.props.appState.venueGraphics = graphics;
                 let eventDates: number[] = graphics.map((graphic: Graphic) => graphic.attributes.eventDate);
                 this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
