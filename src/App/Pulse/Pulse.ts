@@ -8,14 +8,14 @@ import { Renderer } from 'esri/renderers';
 
 export class Pulse {
     private mapLongLatZoom = [0, 0, 1] //default
-    private endNo: any; //highest number in the attribute
-    private startNo: any; //lowest number in attribute
-    private fieldToAnimate: any; //attribute selected 
-    private stepNumber: any; //increment value
-    private setIntervalSpeed = 16.6 //refresh speed in ms
-    private restarting = false //flag to control removing animation 
+    public endNo: any; //highest number in the attribute
+    public startNo: any; //lowest number in attribute
+    public fieldToAnimate: any; //attribute selected 
+    public stepNumber: any; //increment value
+    public setIntervalSpeed = 16.6 //refresh speed in ms
+    public restarting = false //flag to control removing animation 
     private updateField = false //check for attribute change
-    private intervalFunc: any; //animation interval name
+    public intervalFunc: any; //animation interval name
     private overRidingField: any; //casts url field as no.1 selection in attribute selector
     private mapView: MapView;
     private map: Map;
@@ -28,9 +28,10 @@ export class Pulse {
     private newType: any;
     private config: any;
     private animation: { remove: () => void; };
-    private animating: any;
-    private orgEndNo: any;
-    private orgStartNo: any;
+
+    public animating: any;
+    public orgEndNo: any;
+    public orgStartNo: any;
 
     public constructor(map: Map, mapView: MapView, config: any) {
         this.map = map;
@@ -269,6 +270,7 @@ export class Pulse {
         let differencePerSecond = difference / animationTime;
         this.stepNumber = differencePerSecond / this.setIntervalSpeed;
         this.animation = this.animate(this.startNo);
+        
         //adding empty frames at the start and end for fade in/out
         this.orgEndNo = this.endNo;
         this.orgStartNo = this.startNo;
@@ -278,59 +280,59 @@ export class Pulse {
         this.setRenderer(this.startNo);
     }
 
-    private setRenderer = (value: number) => {
+    public setRenderer = (value: number) => {
         this.featureLayer.renderer = this.createRenderer(value);
     }
 
-    private animate(startValue: number) {
-        this.animating = true;
-        let currentFrame = startValue;
+    // private animate(startValue: number) {
+    //     this.animating = true;
+    //     let currentFrame = startValue;
 
-        let frame = () => {
-            if (this.restarting) {
-                clearTimeout(this.intervalFunc);
-                this.restarting = false;
-            }
+    //     let frame = () => {
+    //         if (this.restarting) {
+    //             clearTimeout(this.intervalFunc);
+    //             this.restarting = false;
+    //         }
 
-            currentFrame += this.stepNumber;
+    //         currentFrame += this.stepNumber;
             
-            if (currentFrame > this.endNo) {
-                currentFrame = this.startNo;
-            }
+    //         if (currentFrame > this.endNo) {
+    //             currentFrame = this.startNo;
+    //         }
 
-            let displayNow: number = this.displayNow(currentFrame);
-            this.getDocumentElementById("displayNow").innerHTML = this.fieldToAnimate + " " + displayNow.toString();
-            this.setRenderer(currentFrame);
+    //         let displayNow: number = this.displayNow(currentFrame);
+    //         this.getDocumentElementById("displayNow").innerHTML = this.fieldToAnimate + " " + displayNow.toString();
+    //         this.setRenderer(currentFrame);
 
-            //animation loop.
-            if (this.animating) {
-                this.intervalFunc = setTimeout(function() {
-                    //stops it from overloading.
-                    requestAnimationFrame(frame);
-                }, this.setIntervalSpeed);
-            }
-        }
+    //         //animation loop.
+    //         if (this.animating) {
+    //             this.intervalFunc = setTimeout(function() {
+    //                 //stops it from overloading.
+    //                 requestAnimationFrame(frame);
+    //             }, this.setIntervalSpeed);
+    //         }
+    //     }
 
-        // recursive function, starting the animation.
-        frame();
+    //     // recursive function, starting the animation.
+    //     frame();
 
-        return {
-            remove: () => {
-                this.animating = false;
-            }
-        };
-    }
+    //     return {
+    //         remove: () => {
+    //             this.animating = false;
+    //         }
+    //     };
+    // }
 
-    private displayNow(currentFrame: number) {
-        let displayNow: number = Math.round(currentFrame);
-        if (Math.round(currentFrame) < this.orgStartNo) {
-            displayNow = this.orgStartNo;
-        }
-        else if (Math.round(currentFrame) > this.orgEndNo) {
-            displayNow = this.orgEndNo;
-        }
-        return displayNow;
-    }
+    // private displayNow(currentFrame: number) {
+    //     let displayNow: number = Math.round(currentFrame);
+    //     if (Math.round(currentFrame) < this.orgStartNo) {
+    //         displayNow = this.orgStartNo;
+    //     }
+    //     else if (Math.round(currentFrame) > this.orgEndNo) {
+    //         displayNow = this.orgEndNo;
+    //     }
+    //     return displayNow;
+    // }
     
 
     //CHANGE SYMBOLOGY TYPE HERE. (Point, Line or Polygon style)

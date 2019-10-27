@@ -29,6 +29,9 @@ export class AppState {
     public mapView: MapView;
 
     @observable
+    public displayNow: string;
+
+    @observable
     public venueGraphics: Graphic[];
 
     @observable

@@ -28,6 +28,56 @@ export class PulseComponent extends React.Component<{
         super(props);
     }
 
+    private animate(startValue: number) {
+        this.pulse.animating = true;
+        let currentFrame = startValue;
+
+        let frame = () => {
+            if (this.pulse.restarting) {
+                clearTimeout(this.pulse.intervalFunc);
+                this.pulse.restarting = false;
+            }
+
+            currentFrame += this.pulse.stepNumber;
+            
+            if (currentFrame > this.pulse.endNo) {
+                currentFrame = this.pulse.startNo;
+            }
+
+            let displayNow: number = this.displayNow(currentFrame, this.pulse.orgStartNo, this.pulse.orgEndNo);
+            this.props.appState.displayNow = this.pulse.fieldToAnimate + " " + displayNow.toString();
+            this.pulse.setRenderer(currentFrame);
+
+            //animation loop.
+            if (this.pulse.animating) {
+                this.pulse.intervalFunc = setTimeout(function() {
+                    //stops it from overloading.
+                    requestAnimationFrame(frame);
+                }, this.pulse.setIntervalSpeed);
+            }
+        }
+
+        // recursive function, starting the animation.
+        frame();
+
+        return {
+            remove: () => {
+                this.pulse.animating = false;
+            }
+        };
+    }
+
+    private displayNow(currentFrame: number, orgStartNo: number, orgEndNo: number) {
+        let displayNow: number = Math.round(currentFrame);
+        if (Math.round(currentFrame) < orgStartNo) {
+            displayNow = orgStartNo;
+        }
+        else if (Math.round(currentFrame) > orgEndNo) {
+            displayNow = orgEndNo;
+        }
+        return displayNow;
+    }
+
     private extendPointLayerExtent(extent: Extent, geometry: Geometry): Extent {
         if (geometry.type=="point") {
             if (extent.xmax==0 && extent.xmin==0 && extent.ymax==0 && extent.ymin==0) {
@@ -109,8 +159,8 @@ export class PulseComponent extends React.Component<{
     }
 
     public render() {
-        let { map, mapView, config } = this.props.appState;
-        const {key} = this.props;
+        let { map, mapView, config, displayNow } = this.props.appState;
+        const { key } = this.props;
 
         if (map && mapView && !this.pulse) {
             this.pulse = new Pulse(map, mapView, config);
@@ -142,7 +192,7 @@ export class PulseComponent extends React.Component<{
                 </Tabs>
                 <Button variant="light" id="play">&#9658;</Button>
                 <Button variant="light" id="stop">&#9632;</Button>
-                <Badge variant="info" id="displayNow"></Badge>
+                <Badge variant="info" id="displayNow">{displayNow}</Badge>
             </Container>
         );
     }
