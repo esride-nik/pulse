@@ -44,7 +44,6 @@ export class SetlistFmComponent extends React.Component<{
         return query;
     }
     
-
     private reformatSetlistFmDate(setlistFmDate: string) {
         return setlistFmDate.substr(6,4) + "-" + setlistFmDate.substr(3,2) + "-" + setlistFmDate.substr(0,2);
     }

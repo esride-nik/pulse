@@ -132,6 +132,7 @@ export class Pulse {
     //adds the feature layer to the map.
     private addFeatureLayer = () => {
         let flURL = this.getDocumentElementValueById("fs-url");
+        this.changeFieldSelection();
 
         if (flURL != "") {
             this.featureLayer = new FeatureLayer({
@@ -191,8 +192,9 @@ export class Pulse {
                         this.select.appendChild(opt);
                     }
                 }
-
             }
+            this.changeFieldSelection();
+            this.getMaxMinFromFeatureLayer(flURL);
             this.updateBrowserURL();
         });
     }
@@ -236,12 +238,9 @@ export class Pulse {
     private changeFieldSelection = () => {
         //queries the current feature layer url and field to work out start and end frame.
         this.fieldToAnimate = this.getDocumentElementValueById("selection");
-        this.getMaxMinFromFeatureLayer();
     }
 
-    private getMaxMinFromFeatureLayer = () => {
-        let flURL = this.getDocumentElementValueById("fs-url");
-
+    private getMaxMinFromFeatureLayer = (flURL: string) => {
         axios.get(flURL + "/query", {
             params: {
                 'f': 'pjson',
@@ -262,9 +261,6 @@ export class Pulse {
         }
         this.setRenderer(0);
         this.stepNumber = null;
-        // this.fieldToAnimate = null;
-        // this.startNo = null;
-        // this.endNo = null
         this.restarting = true;
     }
 
@@ -290,7 +286,6 @@ export class Pulse {
     private animate(startValue: number) {
         this.animating = true;
         let currentFrame = startValue;
-        let selection = this.getDocumentElementValueById("selection");
 
         let frame = () => {
             if (this.restarting) {
@@ -305,7 +300,7 @@ export class Pulse {
             }
 
             let displayNow: number = this.displayNow(currentFrame);
-            this.getDocumentElementById("displayNow").innerHTML = selection + " " + displayNow.toString();
+            this.getDocumentElementById("displayNow").innerHTML = this.fieldToAnimate + " " + displayNow.toString();
             this.setRenderer(currentFrame);
 
             //animation loop.
