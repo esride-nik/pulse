@@ -4,8 +4,7 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 import Point = require("esri/geometry/Point");
 import { Extent } from "esri/geometry";
 import axios from 'axios';
-import Query = require('esri/tasks/support/Query');
-import { Renderer, ClassBreaksRenderer } from 'esri/renderers';
+import { Renderer } from 'esri/renderers';
 
 export class Pulse {
     private mapLongLatZoom = [0, 0, 1] //default
