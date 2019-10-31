@@ -15,18 +15,26 @@ export class Pulse {
         return element ? element.value : "";
     }
 
+    public static formatDate(date: Date, orgStartNo: number, orgEndNo: number): string {
+        let adjustedAndFormattedDate = Pulse.formatTwoDigits(date.getDate()) + "." + Pulse.formatTwoDigits(date.getMonth()) + "." + date.getFullYear();
+
+        return adjustedAndFormattedDate;
+    }
+
+    public static adjustCurrentFrame(frame: number, orgStartNo: number, orgEndNo: number): number {
+        let adjustedFrame = Math.round(frame);
+        if (adjustedFrame < orgStartNo) {
+            adjustedFrame = orgStartNo;
+        }
+        else if (adjustedFrame > orgEndNo) {
+            adjustedFrame = orgEndNo;
+        }
+        return adjustedFrame;
+    }
+
     public static adjustAndFormatDate(timestamp: number, orgStartNo: number, orgEndNo: number): string {
-        let adjustedTimestamp = Math.round(timestamp);
-        if (adjustedTimestamp < orgStartNo) {
-            adjustedTimestamp = orgStartNo;
-        }
-        else if (adjustedTimestamp > orgEndNo) {
-            adjustedTimestamp = orgEndNo;
-        }
-        let adjustedDate = new Date(adjustedTimestamp);
-
-        let adjustedAndFormattedDate = Pulse.formatTwoDigits(adjustedDate.getDate()) + "." + Pulse.formatTwoDigits(adjustedDate.getMonth()) + "." + adjustedDate.getFullYear();
-
+        let adjustedTimestamp = this.adjustCurrentFrame(timestamp, orgStartNo, orgEndNo);
+        let adjustedAndFormattedDate = this.formatDate(new Date(adjustedTimestamp), orgStartNo, orgEndNo);
         return adjustedAndFormattedDate;
     }
 

@@ -19,17 +19,13 @@ interface PulseComponentProps {
     key: number
 };
 
-const defaultIntervalSpeed = 16.6; //refresh speed in ms
-const defaultMapLongLatZoom = [0, 0, 1];
-const defaultAnimationTime = 10;
-
 @inject('appState')
 @observer
 export class PulseComponent extends React.Component<PulseComponentProps> {
     private map: Map;
     private mapView: __esri.MapView;
 
-    private selection: React.RefObject<FormControl>;
+    private selection: React.RefObject<unknown>;
     private flUrl: React.RefObject<unknown>;
     private flName: React.RefObject<unknown>;
     private animationTime: React.RefObject<unknown>;
@@ -60,11 +56,9 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.mapView = this.props.appState.mapView;
         this.initPulse();
 
-        this.mapLongLatZoom = defaultMapLongLatZoom;
-        this.intervalSpeed = defaultIntervalSpeed;
-
-        // TODO: Default to config
-        this.animationTime.current.value = defaultAnimationTime;
+        this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
+        this.intervalSpeed = this.props.appState.config.defaultIntervalSpeed;
+        this.animationTime.current.value = this.props.appState.config.defaultAnimationTime;
     }
 
     private initPulse = () => {
@@ -80,7 +74,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             this.mapLongLatZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])];
 
         } else {
-            // this.defaultService();
+            this.flUrl.current.value = this.props.appState.config.defaultService;
         }
 
         this.mapView.when(() => {
@@ -96,11 +90,6 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 zoom: this.mapLongLatZoom[2]
             })
         })
-    }
-
-    //if there's no parameters, then add these in as a default.
-    private defaultService() {
-        this.flUrl.current.value = this.props.appState.config.defaultService;
     }
 
     private play = () => {
@@ -127,7 +116,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         if (this.animation) {
             this.animation.remove();
         }
-        this.setRenderer(0);
+        // this.setRenderer(0);
         this.props.appState.stepNumber = null;
         this.restarting = true;
         this.props.appState.displayNow = "";
@@ -176,7 +165,12 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             //animation loop.
             if (this.animating) {
                 this.setRenderer(currentFrame);
-                this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
+                if (this.props.appState.fieldToAnimate==this.props.appState.config.setlistFmConnector.setlistDateField) {
+                    this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
+                }
+                else {
+                    this.props.appState.displayNow = this.props.appState.fieldToAnimate + ": " + Pulse.adjustCurrentFrame(currentFrame, this.orgStartNo, this.orgEndNo);
+                }
                 this.intervalFunc = setTimeout(function () {
                     //stops it from overloading.
                     requestAnimationFrame(frame);
@@ -215,12 +209,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
         this.setRenderer(this.props.appState.startNo);
-        this.intervalSpeed = 50;
     }
 
     private changeFieldSelection = () => {
-        // TODO: query the current feature layer url and field to work out start and end frame.
         this.props.appState.fieldToAnimate = this.selection.current.value;
+        this.getMaxMinFromFeatureLayerField(this.flUrl.current.value);
     }
 
     private updateExtent(newExtent: Extent) {
@@ -264,19 +257,23 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         this.updateField = false;
                     }
 
-                    // TODO: how to add select option
-                    if (this.selection) {
-                        this.selection.appendChild(opt);
+                    // TODO: What's the right way to programmatically add options to a Bootstrap Select Form.Control?
+                    let selectNode = Pulse.getDocumentElementById("selection");
+                    if (selectNode) {
+                        selectNode.appendChild(opt);
                     }
                 }
             }
+
+            // select first option
+            this.selection.current.value = flData.fields[0].name;
+
             this.changeFieldSelection();
-            this.getMaxMinFromFeatureLayer(flURL);
             this.updateBrowserURL();
         });
     }
 
-    private getMaxMinFromFeatureLayer = (flURL: string) => {
+    private getMaxMinFromFeatureLayerField = (flURL: string) => {
         axios.get(flURL + "/query", {
             params: {
                 'f': 'pjson',
@@ -292,8 +289,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     private setFeatureLayerFromUrl = () => {
-        this.changeFieldSelection();
-        this.mapLongLatZoom = defaultMapLongLatZoom;
+        this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
 
         if (this.flUrl.current.value != "") {
             this.props.appState.pulseFeatureLayer = new FeatureLayer({
@@ -301,6 +297,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             });
             this.map.removeAll();
             this.map.add(this.props.appState.pulseFeatureLayer);
+            this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(this.props.appState.pulseFeatureLayer.geometryType);
 
             //overides ANY scale threshold added to feature layer.
             this.props.appState.pulseFeatureLayer.maxScale = 0;
@@ -308,6 +305,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
             //rest call to get attribute minimum and maximum values.
             this.getFields(this.flUrl.current.value);
+            this.setRenderer(this.props.appState.startNo);
 
             // TODO: remove getDocumentElementById
             Pulse.getDocumentElementById("fs-url").style.borderBottomColor = "green";

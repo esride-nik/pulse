@@ -1,5 +1,8 @@
 {
     "defaultService": "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0",
+    "defaultIntervalSpeed": 16.6,
+    "defaultMapLongLatZoom": [0, 0, 1],
+    "defaultAnimationTime": 10,
     "setlistFmConnector": {
         "setlistDateField": "eventDate",
         "baseUrl": "http://localhost:3000/",
