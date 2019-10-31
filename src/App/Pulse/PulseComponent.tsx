@@ -27,7 +27,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private selection: React.RefObject<unknown>;
     private flUrl: React.RefObject<unknown>;
     private flName: React.RefObject<unknown>;
-    private animationTime: React.RefObject<unknown>;
+    private animationSpeed: React.RefObject<unknown>;
 
     private orgEndNo: number;
     private orgStartNo: number;
@@ -39,6 +39,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private animating: boolean;
     private intervalFunc: any; //animation interval name
     private intervalSpeed: number;
+    animationTime: number;
 
 
     constructor(props: PulseComponentProps) {
@@ -47,7 +48,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.selection = React.createRef();
         this.flUrl = React.createRef();
         this.flName = React.createRef();
-        this.animationTime = React.createRef();
+        this.animationSpeed = React.createRef();
     }
 
     public componentDidMount() {
@@ -59,10 +60,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.intervalSpeed = this.props.appState.config.defaultIntervalSpeed;
     }
 
-    private setAnimationTime = (a: any) => {
+    private setAnimationSpeed = (a: any) => {
         let { startNo, endNo } = this.props.appState;
-        
-        this.animationTime.current.value = a.toFixed(0);
+
+        this.animationSpeed.current.value = a.toFixed(0);
+        this.animationTime = 100-this.animationSpeed.current.value;
         this.generateStepNumber(startNo, endNo);
     }
 
@@ -75,7 +77,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             var partsOfStr = browserURL.split(',');
             this.flUrl.current.value = partsOfStr[0];
             this.overRidingField = partsOfStr[1];
-            this.animationTime.current.value = partsOfStr[2];
+            this.animationSpeed.current.value = partsOfStr[2];
             this.mapLongLatZoom = [parseInt(partsOfStr[3]), parseInt(partsOfStr[4]), parseInt(partsOfStr[5])];
 
         } else {
@@ -100,6 +102,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private play = () => {
         //Stops any previously added animations in the frame
         this.stopAnimation();
+        
+        this.animationTime = 100-this.animationSpeed.current.value;
 
         //There's an unknown issue caused by "ObjectID"
         //This is currently a workaround for it.
@@ -129,7 +133,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     private generateStepNumber(startNo: number, endNo: number) {
         let difference = Math.abs(startNo - endNo);
-        let differencePerSecond = difference / this.animationTime.current.value;
+        let differencePerSecond = difference / this.animationTime;
         let stepNumber = differencePerSecond / this.intervalSpeed;
         this.props.appState.stepNumber = stepNumber
     }
@@ -211,6 +215,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     public setSetlistFmFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
+        this.animationTime = 100-this.animationSpeed.current.value;
         this.map.removeAll();
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
@@ -355,10 +360,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         Animation speed
                     </Col>
                     <Col>
-                        <Knob onChange={this.setAnimationTime} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationTime} />
+                        <Knob onChange={this.setAnimationSpeed} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
                     </Col>
                     <Col className="extra-tab-value">
-                        <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationTime} />
+                        <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
                     </Col>
                 </Row>
 
