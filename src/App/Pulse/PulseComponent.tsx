@@ -14,13 +14,14 @@ import FeatureLayer from 'esri/layers/FeatureLayer';
 import Extent from 'esri/geometry/Extent';
 import Point from 'esri/geometry/Point';
 
-const defaultMapLongLatZoom = [0, 0, 1];
-const setIntervalSpeed = 16.6; //refresh speed in ms
-
 interface PulseComponentProps {
     appState?: AppState,
     key: number
 };
+
+const defaultIntervalSpeed = 16.6; //refresh speed in ms
+const defaultMapLongLatZoom = [0, 0, 1];
+const defaultAnimationTime = 10;
 
 @inject('appState')
 @observer
@@ -42,6 +43,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private mapLongLatZoom: number[];
     private animating: boolean;
     private intervalFunc: any; //animation interval name
+    private intervalSpeed: number;
 
 
     constructor(props: PulseComponentProps) {
@@ -59,9 +61,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.initPulse();
 
         this.mapLongLatZoom = defaultMapLongLatZoom;
+        this.intervalSpeed = defaultIntervalSpeed;
 
         // TODO: Default to config
-        this.animationTime.current.value = 10;
+        this.animationTime.current.value = defaultAnimationTime;
     }
 
     private initPulse = () => {
@@ -127,6 +130,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.setRenderer(0);
         this.props.appState.stepNumber = null;
         this.restarting = true;
+        this.props.appState.displayNow = "";
     }
 
     private calculateParametersAndStartAnimation = (animationTime: number) => {
@@ -135,7 +139,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         //generate step number here too
         let difference = Math.abs(startNo - endNo);
         let differencePerSecond = difference / animationTime;
-        let stepNumber = differencePerSecond / setIntervalSpeed;
+        let stepNumber = differencePerSecond / this.intervalSpeed;
         this.props.appState.stepNumber = stepNumber
 
         //adding empty frames at the start and end for fade in/out
@@ -169,15 +173,14 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 currentFrame = this.props.appState.startNo;
             }
 
-            this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
-            this.setRenderer(currentFrame);
-
             //animation loop.
             if (this.animating) {
+                this.setRenderer(currentFrame);
+                this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
                 this.intervalFunc = setTimeout(function () {
                     //stops it from overloading.
                     requestAnimationFrame(frame);
-                }, setIntervalSpeed);
+                }, this.intervalSpeed);
             }
         }
 
@@ -206,13 +209,13 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         // this.updateBrowserURL();
     }
 
-    public setClientSideFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
+    public setSetlistFmFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
         this.map.removeAll();
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
-
         this.setRenderer(this.props.appState.startNo);
+        this.intervalSpeed = 50;
     }
 
     private changeFieldSelection = () => {
@@ -290,6 +293,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     private setFeatureLayerFromUrl = () => {
         this.changeFieldSelection();
+        this.mapLongLatZoom = defaultMapLongLatZoom;
 
         if (this.flUrl.current.value != "") {
             this.props.appState.pulseFeatureLayer = new FeatureLayer({
@@ -323,7 +327,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             <Container>
                 <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
                     <Tab eventKey="setlistfm" title="Setlist.fm">
-                        <SetlistFmComponent key={key} setFeatureLayer={this.setClientSideFeatureLayer} />
+                        <SetlistFmComponent key={key} setFeatureLayer={this.setSetlistFmFeatureLayer} />
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
