@@ -177,8 +177,6 @@ export class SetlistFmComponent extends React.Component<{
             fullExtent: fullExtent
         });
 
-        // this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
-
         let eventDates: number[] = venueGraphics.map((graphic: Graphic) => graphic.attributes.eventDate);
         this.props.appState.startNo = Math.min(...eventDates);
         this.props.appState.endNo = Math.max(...eventDates);

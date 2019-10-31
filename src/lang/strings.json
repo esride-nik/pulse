@@ -1,3 +1,7 @@
 {
-    
+    "eventDate": {
+        "de": "Konzertdatum",
+        "en": "Event Date",
+        "fr": "Date d'évent"
+    }
 }

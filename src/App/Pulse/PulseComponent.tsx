@@ -148,7 +148,9 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     public setRenderer = (value: number) => {
-        this.props.appState.pulseFeatureLayer.renderer = Pulse.createRenderer(value, this.props.appState.pulseFeatureLayerSymbol, this.props.appState.fieldToAnimate, this.props.appState.stepNumber);
+        if (this.props.appState.pulseFeatureLayer) {
+            this.props.appState.pulseFeatureLayer.renderer = Pulse.createRenderer(value, this.props.appState.pulseFeatureLayerSymbol, this.props.appState.fieldToAnimate, this.props.appState.stepNumber);
+        }
     }
 
     private animate = (startValue: number) => {
@@ -167,8 +169,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 currentFrame = this.props.appState.startNo;
             }
 
-            let displayNow: number = this.displayNow(currentFrame, this.orgStartNo, this.orgEndNo);
-            this.props.appState.displayNow = this.props.appState.fieldToAnimate + " " + displayNow.toString();
+            this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
             this.setRenderer(currentFrame);
 
             //animation loop.
@@ -203,17 +204,6 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         //     this.mapLongLatZoom = [this.mapView.center.longitude, this.mapView.center.latitude, this.mapView.zoom];
         // }
         // this.updateBrowserURL();
-    }
-
-    private displayNow(currentFrame: number, orgStartNo: number, orgEndNo: number) {
-        let displayNow: number = Math.round(currentFrame);
-        if (Math.round(currentFrame) < orgStartNo) {
-            displayNow = orgStartNo;
-        }
-        else if (Math.round(currentFrame) > orgEndNo) {
-            displayNow = orgEndNo;
-        }
-        return displayNow;
     }
 
     public setClientSideFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
@@ -326,13 +316,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
 
     public render() {
-        let { map, mapView, config, displayNow } = this.props.appState;
+        let { displayNow } = this.props.appState;
         const { key } = this.props;
-
-        // if (this.props.appState.pulseFeatureLayerChanged) {
-        //     this.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
-        //     this.setPulseFeatureLayerUnchanged();
-        // }
 
         return (
             <Container>

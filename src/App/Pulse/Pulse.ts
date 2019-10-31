@@ -15,6 +15,25 @@ export class Pulse {
         return element ? element.value : "";
     }
 
+    public static adjustAndFormatDate(timestamp: number, orgStartNo: number, orgEndNo: number): string {
+        let adjustedTimestamp = Math.round(timestamp);
+        if (adjustedTimestamp < orgStartNo) {
+            adjustedTimestamp = orgStartNo;
+        }
+        else if (adjustedTimestamp > orgEndNo) {
+            adjustedTimestamp = orgEndNo;
+        }
+        let adjustedDate = new Date(adjustedTimestamp);
+
+        let adjustedAndFormattedDate = Pulse.formatTwoDigits(adjustedDate.getDate()) + "." + Pulse.formatTwoDigits(adjustedDate.getMonth()) + "." + adjustedDate.getFullYear();
+
+        return adjustedAndFormattedDate;
+    }
+
+    private static formatTwoDigits(number: number) {
+        return number.toString().padStart(2, '0');
+    }
+
     public static symbolSwitcher(geometryType): Symbol {
         let symbol: Symbol;
 
