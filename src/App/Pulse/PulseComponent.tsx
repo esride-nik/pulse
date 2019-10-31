@@ -219,6 +219,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.map.removeAll();
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
+        this.props.appState.pulseSourceLoaded = true;
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
         this.setRenderer(this.props.appState.startNo);
     }
@@ -319,6 +320,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             this.getFields(this.flUrl.current.value);
             this.setRenderer(this.props.appState.startNo);
 
+            this.props.appState.pulseSourceLoaded = true;
+
             // TODO: remove getDocumentElementById
             Pulse.getDocumentElementById("fs-url").style.borderBottomColor = "green";
         } else {
@@ -331,6 +334,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     public render() {
         let { displayNow } = this.props.appState;
         const { key } = this.props;
+
+        let disabled = false;
+        if (!this.props.appState.pulseSourceLoaded) {
+            disabled = true;
+        }
 
         return (
             <Container>
@@ -352,8 +360,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     </Tab>
                 </Tabs>
 
-                <Button variant="light" id="play" onClick={this.play}>&#9658;</Button>
-                <Button variant="light" id="stop" onClick={this.stopAnimation}>&#9632;</Button>
+                <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
+                <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
 
                 <Row className="extra-tab">
                     <Col className="extra-tab-label">

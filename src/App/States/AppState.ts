@@ -44,6 +44,9 @@ export class AppState {
     public stepNumber: number;
 
     @observable
+    public pulseSourceLoaded: boolean;
+
+    @observable
     public pulseFeatureLayer: FeatureLayer;
 
     @observable

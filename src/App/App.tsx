@@ -18,6 +18,10 @@ class App extends React.Component<{
         super(props);
     }
 
+    public componentDidMount() {
+        this.props.appState.pulseSourceLoaded = false;
+    }
+
     @computed
     public get nls() {
         return this.props.appState.nls

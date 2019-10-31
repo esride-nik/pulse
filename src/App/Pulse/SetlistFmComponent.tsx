@@ -190,7 +190,7 @@ export class SetlistFmComponent extends React.Component<{
         return (
             <Container>
                 <Row>
-                    <Form.Control type="text" id="artist" placeholder="Enter an artist name" className="artist" onKeyDown={this.handleKeyDown} ref={this.artist}/>
+                    <Form.Control type="text" id="artist" placeholder="Enter an artist name" className="artist" onKeyDown={this.handleKeyDown} onBlur={this.querySetlists} ref={this.artist}/>
                 </Row>
                 <Row>
                     <Button variant="light" id="setlist" onClick={this.querySetlists}>&#9636;</Button>
