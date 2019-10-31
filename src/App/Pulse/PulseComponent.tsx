@@ -365,8 +365,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     </Tab>
                 </Tabs>
 
-                <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
-                <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
+                <Row className="extra-tab">
+                    <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
+                    <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
+                </Row>
 
                 <Row className="extra-tab">
                     <Col className="extra-tab-label">

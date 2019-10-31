@@ -191,14 +191,14 @@ export class SetlistFmComponent extends React.Component<{
 
     public render() {
         return (
-            <Container>
-                <Row>
+            <Row className="setlistFmForm">
+                <Col>
                     <Form.Control type="text" id="artist" placeholder="Enter an artist name" className="artist" onKeyDown={this.handleKeyDown} onBlur={this.querySetlists} ref={this.artist}/>
-                </Row>
-                <Row>
+                </Col>
+                <Col>
                     <Button variant="light" id="setlist" onClick={this.querySetlists}>&#9636;</Button>
-                </Row>
-            </Container>
+                </Col>
+            </Row>
         );
     }
 
