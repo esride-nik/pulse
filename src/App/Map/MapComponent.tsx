@@ -29,10 +29,9 @@ export class MapComponent extends React.Component<{
             zoom: 3,
             center: [0, 0]
         });
-        this.mapView.when(() => {
-            this.props.appState.map = this.map;
-            this.props.appState.mapView = this.mapView;
-        });
+
+        this.props.appState.map = this.map;
+        this.props.appState.mapView = this.mapView;
     }
 
     public render() {

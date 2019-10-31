@@ -180,12 +180,13 @@ export class SetlistFmComponent extends React.Component<{
         // HIER WEITER / PROCEED HERE: Pulse.featureLayer shall always come from appState. Only this way we can avoid setting it manually! We don't want a Pulse instance here. => Merge Pulse with PulseComponent
         // pass setter through state!?
         this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
-        this.props.appState.pulseFeatureLayerChanged = true;
 
         let eventDates: number[] = venueGraphics.map((graphic: Graphic) => graphic.attributes.eventDate);
         this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
         this.props.appState.fieldToAnimateMaxValue = Math.max(...eventDates);
         this.props.appState.fieldToAnimate = "eventDate";
+        
+        this.props.appState.pulseFeatureLayerChanged = true;
 
         // if (this.pulse) {
         //     this.pulse.setFeatureLayer(venuesFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);

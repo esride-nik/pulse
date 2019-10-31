@@ -44,7 +44,13 @@ export class AppState {
     public fieldToAnimateMaxValue: number;
 
     @observable
+    public stepNumber: number;
+
+    @observable
     public pulseFeatureLayer: FeatureLayer;
+
+    @observable
+    public pulseFeatureLayerSymbol: Symbol;
 
     @observable
     public pulseFeatureLayerChanged: boolean;
