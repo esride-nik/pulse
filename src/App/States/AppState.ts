@@ -44,6 +44,12 @@ export class AppState {
     public fieldToAnimateMaxValue: number;
 
     @observable
+    public startNo: number;
+
+    @observable
+    public endNo: number;
+
+    @observable
     public stepNumber: number;
 
     @observable

@@ -2,10 +2,6 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 import { Renderer } from 'esri/renderers';
 
 export class Pulse {
-    public intervalFunc: any; //animation interval name
-    public featureLayer: FeatureLayer;
-
-
     
 // #region STATIC
 
