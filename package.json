@@ -22,6 +22,7 @@
     "react-dom": "^16.8.3",
     "react-hot-loader": "^4.7.1",
     "react-overlays": "^1.1.2",
+    "react-rotary-knob": "^1.1.7",
     "react-transition-group": "^2.6.0",
     "uncontrollable": "^6.1.0"
   },

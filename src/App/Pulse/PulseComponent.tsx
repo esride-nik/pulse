@@ -7,12 +7,11 @@ import { Container, Col, Row, Form, Card, ListGroup, Alert, Button, Tabs, Tab, B
 import { observable } from 'mobx';
 import Map from 'esri/Map';
 import axios from 'axios';
-
-// import { cssMapToString } from 'esrich.web.common.react/utils/tsxUtils';
 import './PulseComponent.scss';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import Extent from 'esri/geometry/Extent';
 import Point from 'esri/geometry/Point';
+import { Knob } from 'react-rotary-knob';
 
 interface PulseComponentProps {
     appState?: AppState,
@@ -58,7 +57,13 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
         this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
         this.intervalSpeed = this.props.appState.config.defaultIntervalSpeed;
-        this.animationTime.current.value = this.props.appState.config.defaultAnimationTime;
+    }
+
+    private setAnimationTime = (a: any) => {
+        let { startNo, endNo } = this.props.appState;
+        
+        this.animationTime.current.value = a.toFixed(0);
+        this.generateStepNumber(startNo, endNo);
     }
 
     private initPulse = () => {
@@ -109,7 +114,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
 
         this.updateBrowserURL();
-        this.calculateParametersAndStartAnimation(this.animationTime.current.value);
+        this.calculateParametersAndStartAnimation();
     }
 
     public stopAnimation = () => {
@@ -122,20 +127,22 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.props.appState.displayNow = "";
     }
 
-    private calculateParametersAndStartAnimation = (animationTime: number) => {
-        let { startNo, endNo } = this.props.appState;
-
-        //generate step number here too
+    private generateStepNumber(startNo: number, endNo: number) {
         let difference = Math.abs(startNo - endNo);
-        let differencePerSecond = difference / animationTime;
+        let differencePerSecond = difference / this.animationTime.current.value;
         let stepNumber = differencePerSecond / this.intervalSpeed;
         this.props.appState.stepNumber = stepNumber
+    }
+
+    private calculateParametersAndStartAnimation = () => {
+        let { startNo, endNo } = this.props.appState;
+        this.generateStepNumber(startNo, endNo);
 
         //adding empty frames at the start and end for fade in/out
         this.orgEndNo = endNo;
         this.orgStartNo = startNo;
-        endNo += stepNumber * 40;
-        startNo -= stepNumber * 2;
+        endNo += this.props.appState.stepNumber * 40;
+        startNo -= this.props.appState.stepNumber * 2;
 
         this.animation = this.animate(startNo);
     }
@@ -165,7 +172,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             //animation loop.
             if (this.animating) {
                 this.setRenderer(currentFrame);
-                if (this.props.appState.fieldToAnimate==this.props.appState.config.setlistFmConnector.setlistDateField) {
+                if (this.props.appState.fieldToAnimate == this.props.appState.config.setlistFmConnector.setlistDateField) {
                     this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
                 }
                 else {
@@ -316,7 +323,6 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
 
-
     public render() {
         let { displayNow } = this.props.appState;
         const { key } = this.props;
@@ -341,10 +347,21 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     </Tab>
                 </Tabs>
 
-                Animation time <Form.Control type="text" id="animation-time" placeholder="Enter duration in seconds here" className="animation-time" ref={this.animationTime} /> seconds
-
                 <Button variant="light" id="play" onClick={this.play}>&#9658;</Button>
                 <Button variant="light" id="stop" onClick={this.stopAnimation}>&#9632;</Button>
+
+                <Row className="extra-tab">
+                    <Col className="extra-tab-label">
+                        Animation speed
+                    </Col>
+                    <Col>
+                        <Knob onChange={this.setAnimationTime} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationTime} />
+                    </Col>
+                    <Col className="extra-tab-value">
+                        <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationTime} />
+                    </Col>
+                </Row>
+
                 <Badge variant="info" id="displayNow">{displayNow}</Badge>
             </Container>
         );
