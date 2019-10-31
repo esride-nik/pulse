@@ -18,7 +18,8 @@ import FeatureLayer from 'esri/layers/FeatureLayer';
 export class SetlistFmComponent extends React.Component<{
     appState?: AppState,
     key: number,
-    setFeatureLayer: Function
+    setFeatureLayer: Function,
+    stopAnimation: Function
 }> {
     setlistFmConnector: any;
     artist: React.RefObject<unknown>;
@@ -53,6 +54,8 @@ export class SetlistFmComponent extends React.Component<{
     }
 
     public querySetlists = () => {
+        this.props.stopAnimation();
+        
         const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;
 
         let query = this.buildSetlistFmQuery();

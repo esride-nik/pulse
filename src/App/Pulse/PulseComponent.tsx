@@ -227,6 +227,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     private changeFieldSelection = () => {
+        this.stopAnimation();
         this.props.appState.fieldToAnimate = this.selection.current.value;
         this.getMaxMinFromFeatureLayerField(this.flUrl.current.value);
     }
@@ -305,6 +306,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     private setFeatureLayerFromUrl = () => {
+        this.stopAnimation();
         this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
 
         if (this.flUrl.current.value != "") {
@@ -347,7 +349,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             <Container>
                 <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
                     <Tab eventKey="setlistfm" title="Setlist.fm">
-                        <SetlistFmComponent key={key} setFeatureLayer={this.setSetlistFmFeatureLayer} />
+                        <SetlistFmComponent key={key} setFeatureLayer={this.setSetlistFmFeatureLayer} stopAnimation={this.stopAnimation} />
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
