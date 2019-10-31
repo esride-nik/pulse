@@ -39,8 +39,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private animating: boolean;
     private intervalFunc: any; //animation interval name
     private intervalSpeed: number;
-    animationTime: number;
-
+    private animationTime: number;
+    
+    @observable
+    private flNameString: string = "";
 
     constructor(props: PulseComponentProps) {
         super(props);
@@ -248,6 +250,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         axios.get(flURL + "?f=json").then((flResponse: any) => {
             var flData = flResponse.data;
             this.flName.current.value = flData.name;
+            this.flNameString = flData.name;
             this.updateExtent(flData.extent);
             this.selection.current.value = "";
             let symbol = Pulse.symbolSwitcher(flData.geometryType);
@@ -348,8 +351,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
+                            <Form.Label id="feature-layer-name" ref={this.flName}>{this.flNameString}</Form.Label>
                             <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url" ref={this.flUrl} onBlur={this.setFeatureLayerFromUrl} />
-                            <Form.Label id="feature-layer-name" ref={this.flName}>...</Form.Label>
                         </Row>
                         <Row>
                             Select attribute to animate
