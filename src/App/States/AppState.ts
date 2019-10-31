@@ -32,16 +32,7 @@ export class AppState {
     public displayNow: string;
 
     @observable
-    public venueGraphics: Graphic[];
-
-    @observable
     public fieldToAnimate: string;
-
-    @observable
-    public fieldToAnimateMinValue: number;
-
-    @observable
-    public fieldToAnimateMaxValue: number;
 
     @observable
     public startNo: number;

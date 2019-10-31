@@ -130,13 +130,13 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     }
 
     private calculateParametersAndStartAnimation = (animationTime: number) => {
-        let { startNo, endNo, stepNumber } = this.props.appState;
+        let { startNo, endNo } = this.props.appState;
 
         //generate step number here too
         let difference = Math.abs(startNo - endNo);
         let differencePerSecond = difference / animationTime;
-        stepNumber = differencePerSecond / setIntervalSpeed;
-        this.animation = this.animate(startNo);
+        let stepNumber = differencePerSecond / setIntervalSpeed;
+        this.props.appState.stepNumber = stepNumber
 
         //adding empty frames at the start and end for fade in/out
         this.orgEndNo = endNo;
@@ -144,14 +144,14 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         endNo += stepNumber * 40;
         startNo -= stepNumber * 2;
 
-        this.setRenderer(startNo);
+        this.animation = this.animate(startNo);
     }
 
     public setRenderer = (value: number) => {
         this.props.appState.pulseFeatureLayer.renderer = Pulse.createRenderer(value, this.props.appState.pulseFeatureLayerSymbol, this.props.appState.fieldToAnimate, this.props.appState.stepNumber);
     }
 
-    private animate(startValue: number) {
+    private animate = (startValue: number) => {
         this.animating = true;
         let currentFrame = startValue;
 
@@ -221,6 +221,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
+
+        this.setRenderer(this.props.appState.startNo);
     }
 
     private changeFieldSelection = () => {

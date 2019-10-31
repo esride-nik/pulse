@@ -135,7 +135,7 @@ export class SetlistFmComponent extends React.Component<{
         });
 
         let graphicsCollection = new Collection();
-        graphicsCollection.addMany(this.props.appState.venueGraphics);
+        graphicsCollection.addMany(venueGraphics);
 
         const venuesFeatureLayer = new FeatureLayer({
             // create an instance of esri/layers/support/Field for each field object
@@ -180,12 +180,12 @@ export class SetlistFmComponent extends React.Component<{
         // this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
 
         let eventDates: number[] = venueGraphics.map((graphic: Graphic) => graphic.attributes.eventDate);
-        this.props.appState.fieldToAnimateMinValue = Math.min(...eventDates);
-        this.props.appState.fieldToAnimateMaxValue = Math.max(...eventDates);
+        this.props.appState.startNo = Math.min(...eventDates);
+        this.props.appState.endNo = Math.max(...eventDates);
         this.props.appState.fieldToAnimate = "eventDate";
         this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
         
-        this.props.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
+        this.props.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.startNo, this.props.appState.endNo);
     }
 
     public render() {
