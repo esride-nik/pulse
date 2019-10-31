@@ -187,7 +187,6 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             }
         };
     }
-
     
     //this generates a new, sharable url link.
     public updateBrowserURL() {
@@ -215,12 +214,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         return displayNow;
     }
 
-    private setPulseFeatureLayerUnchanged() {
-        this.props.appState.pulseFeatureLayerChanged = false;
-    }
-
-
-    public setFeatureLayer(featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) {
+    public setFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
         this.map.removeAll();
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
@@ -335,16 +329,16 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         let { map, mapView, config, displayNow } = this.props.appState;
         const { key } = this.props;
 
-        if (this.props.appState.pulseFeatureLayerChanged) {
-            this.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
-            this.setPulseFeatureLayerUnchanged();
-        }
+        // if (this.props.appState.pulseFeatureLayerChanged) {
+        //     this.setFeatureLayer(this.props.appState.pulseFeatureLayer, this.props.appState.fieldToAnimate, this.props.appState.fieldToAnimateMinValue, this.props.appState.fieldToAnimateMaxValue);
+        //     this.setPulseFeatureLayerUnchanged();
+        // }
 
         return (
             <Container>
                 <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
                     <Tab eventKey="setlistfm" title="Setlist.fm">
-                        <SetlistFmComponent key={key}/>
+                        <SetlistFmComponent key={key} setFeatureLayer={this.setFeatureLayer}/>
                     </Tab>
                     <Tab eventKey="featureLayer" title="FeatureLayer">
                         <Row>
