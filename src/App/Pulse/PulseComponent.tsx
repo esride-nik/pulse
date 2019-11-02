@@ -181,10 +181,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             });
             if (setlistsAfterNow.length>0) {
                 const reducer = (max, cur) => Math.min( max, cur );
-                let eventDateAfterNow = setlistsAfterNow.map((setlist) => {
-                    console.log("AFTER NOW", setlist.eventDate);
-                    return setlist.eventDate;
-                }).reduce(reducer, Infinity);
+                let eventDateAfterNow = setlistsAfterNow.map((setlist) => setlist.eventDate).reduce(reducer, Infinity);
                 this.props.appState.nextSetlist = setlistsAfterNow.filter((setlist) => setlist.eventDate===eventDateAfterNow)[0];
             }
         }
@@ -417,7 +414,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         </Col>
                     </Row>
 
-                    <Badge variant="info" id="displayNow">{displayNow}</Badge>
+                    <Badge variant="dark" id="displayNow">{displayNow}</Badge>
                 </div>
                 <div className="pulseBottom">
                     <SetlistDetailsComponent />
