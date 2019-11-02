@@ -14,6 +14,7 @@ import Point from 'esri/geometry/Point';
 import { Knob } from 'react-rotary-knob';
 
 import { SetlistDetailsComponent } from './SetlistDetailsComponent';
+import Graphic from 'esri/Graphic';
 
 interface PulseComponentProps {
     appState?: AppState,
@@ -43,6 +44,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     
     @observable
     private flNameString: string = "";
+    lastSetlist: any;
 
     constructor(props: PulseComponentProps) {
         super(props);
@@ -374,6 +376,26 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         let disabled = false;
         if (!this.props.appState.pulseSourceLoaded) {
             disabled = true;
+        }
+
+        if (!this.lastSetlist) {
+            this.lastSetlist = this.props.appState.recentSetlist;
+        }
+        if (this.lastSetlist != this.props.appState.recentSetlist) {
+            if (this.props.appState.recentSetlist && this.props.appState.pulseFeatureLayer) {
+                let nextSetlistLocationQueryParams = this.props.appState.pulseFeatureLayer.createQuery();
+                nextSetlistLocationQueryParams.where = "OBJECTID = " + this.lastSetlist.OBJECTID + " OR OBJECTID = " + this.props.appState.recentSetlist.OBJECTID;
+                this.props.appState.pulseFeatureLayer.queryFeatures(nextSetlistLocationQueryParams).then((res: any) => {
+                    let geometries = res.features.map((feature: Graphic) => feature.geometry);
+                    console.log(geometries);
+                    if (res.features.length>0) {
+                        this.mapView.goTo({
+                            target: geometries
+                        });
+                    }
+                });
+            }
+            this.lastSetlist = this.props.appState.recentSetlist;
         }
 
         return (
