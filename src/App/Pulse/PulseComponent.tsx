@@ -13,6 +13,8 @@ import Extent from 'esri/geometry/Extent';
 import Point from 'esri/geometry/Point';
 import { Knob } from 'react-rotary-knob';
 
+import { SetlistDetailsComponent } from './SetlistDetailsComponent';
+
 interface PulseComponentProps {
     appState?: AppState,
     key: number
@@ -29,8 +31,6 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     private flName: React.RefObject<unknown>;
     private animationSpeed: React.RefObject<unknown>;
 
-    private orgEndNo: number;
-    private orgStartNo: number;
     private animation: { remove: () => void; };
     private restarting = false //flag to control removing animation 
     private updateField = false //check for attribute change
@@ -145,8 +145,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.generateStepNumber(startNo, endNo);
 
         //adding empty frames at the start and end for fade in/out
-        this.orgEndNo = endNo;
-        this.orgStartNo = startNo;
+        this.props.appState.orgEndNo = endNo;
+        this.props.appState.orgStartNo = startNo;
         endNo += this.props.appState.stepNumber * 40;
         startNo -= this.props.appState.stepNumber * 2;
 
@@ -161,7 +161,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     private animate = (startValue: number) => {
         this.animating = true;
-        let currentFrame = startValue;
+        this.props.appState.currentFrame = startValue;
 
         let frame = () => {
             if (this.restarting) {
@@ -169,20 +169,22 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 this.restarting = false;
             }
 
-            currentFrame += this.props.appState.stepNumber;
+            this.props.appState.currentFrame += this.props.appState.stepNumber;
 
-            if (currentFrame > this.props.appState.endNo) {
-                currentFrame = this.props.appState.startNo;
+            if (this.props.appState.currentFrame > this.props.appState.endNo) {
+                this.props.appState.currentFrame = this.props.appState.startNo;
             }
 
             //animation loop.
             if (this.animating) {
-                this.setRenderer(currentFrame);
+                this.setRenderer(this.props.appState.currentFrame);
                 if (this.props.appState.fieldToAnimate == this.props.appState.config.setlistFmConnector.setlistDateField) {
-                    this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " + Pulse.adjustAndFormatDate(currentFrame, this.orgStartNo, this.orgEndNo);
+                    this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " 
+                        + Pulse.adjustAndFormatDate(this.props.appState.currentFrame, this.props.appState.orgStartNo, this.props.appState.orgEndNo);
                 }
                 else {
-                    this.props.appState.displayNow = this.props.appState.fieldToAnimate + ": " + Pulse.adjustCurrentFrame(currentFrame, this.orgStartNo, this.orgEndNo);
+                    this.props.appState.displayNow = this.props.appState.fieldToAnimate + ": " 
+                        + Pulse.adjustCurrentFrame(this.props.appState.currentFrame, this.props.appState.orgStartNo, this.props.appState.orgEndNo);
                 }
                 this.intervalFunc = setTimeout(function () {
                     //stops it from overloading.
@@ -335,10 +337,29 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
     }
 
+    getRecentSetlist(now: number): any {
+        if (now) {
+            let setlistsBeforeNow = this.props.appState.setlists.filter((setlist) => {
+                let floorNow = Math.floor(now);
+                if (setlist.eventDate<=floorNow) {
+                    return setlist;
+                }
+            });
+            if (setlistsBeforeNow.length>0) {
+                const reducer = (max, cur) => Math.max( max, cur );
+                let eventDateBeforeNow = setlistsBeforeNow.map((setlist) => setlist.eventDate).reduce(reducer, -Infinity);
+                return setlistsBeforeNow.filter((setlist) => setlist.eventDate===eventDateBeforeNow)[0];
+            }
+            return {};
+        }
+        return {};
+    }
 
     public render() {
         let { displayNow } = this.props.appState;
         const { key } = this.props;
+        
+        let recentSetlist = this.getRecentSetlist(this.props.appState.currentFrame);
 
         let disabled = false;
         if (!this.props.appState.pulseSourceLoaded) {
@@ -346,43 +367,48 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
 
         return (
-            <Container>
-                <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
-                    <Tab eventKey="setlistfm" title="Setlist.fm">
-                        <SetlistFmComponent key={key} setFeatureLayer={this.setSetlistFmFeatureLayer} stopAnimation={this.stopAnimation} />
-                    </Tab>
-                    <Tab eventKey="featureLayer" title="FeatureLayer">
-                        <Row>
-                            <Form.Label id="feature-layer-name" ref={this.flName}>{this.flNameString}</Form.Label>
-                            <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url" ref={this.flUrl} onBlur={this.setFeatureLayerFromUrl} />
-                        </Row>
-                        <Row>
-                            Select attribute to animate
-                            <Form.Control as="select" id="selection" ref={this.selection} onChange={this.changeFieldSelection}>
-                                <option></option>
-                            </Form.Control>
-                        </Row>
-                    </Tab>
-                </Tabs>
+            <Container className="pulse100">
+                <div className="pulseTop">
+                    <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
+                        <Tab eventKey="setlistfm" title="Setlist.fm">
+                            <SetlistFmComponent key={key} setFeatureLayer={this.setSetlistFmFeatureLayer} stopAnimation={this.stopAnimation} />
+                        </Tab>
+                        <Tab eventKey="featureLayer" title="FeatureLayer">
+                            <Row>
+                                <Form.Label id="feature-layer-name" ref={this.flName}>{this.flNameString}</Form.Label>
+                                <Form.Control type="text" id="fs-url" placeholder="Enter a FeatureServer URL here" className="fs-url" ref={this.flUrl} onBlur={this.setFeatureLayerFromUrl} />
+                            </Row>
+                            <Row>
+                                Select attribute to animate
+                                <Form.Control as="select" id="selection" ref={this.selection} onChange={this.changeFieldSelection}>
+                                    <option></option>
+                                </Form.Control>
+                            </Row>
+                        </Tab>
+                    </Tabs>
 
-                <Row className="extra-tab">
-                    <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
-                    <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
-                </Row>
+                    <Row className="extra-tab">
+                        <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
+                        <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
+                    </Row>
 
-                <Row className="extra-tab">
-                    <Col className="extra-tab-label">
-                        Animation speed
-                    </Col>
-                    <Col>
-                        <Knob onChange={this.setAnimationSpeed} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
-                    </Col>
-                    <Col className="extra-tab-value">
-                        <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
-                    </Col>
-                </Row>
+                    <Row className="extra-tab">
+                        <Col className="extra-tab-label">
+                            Animation speed
+                        </Col>
+                        <Col>
+                            <Knob onChange={this.setAnimationSpeed} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
+                        </Col>
+                        <Col className="extra-tab-value">
+                            <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
+                        </Col>
+                    </Row>
 
-                <Badge variant="info" id="displayNow">{displayNow}</Badge>
+                    <Badge variant="info" id="displayNow">{displayNow}</Badge>
+                </div>
+                <div className="pulseBottom">
+                    <SetlistDetailsComponent recentSetlist={recentSetlist} />
+                </div>
             </Container>
         );
     }

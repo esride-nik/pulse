@@ -35,6 +35,15 @@ export class AppState {
     public fieldToAnimate: string;
 
     @observable
+    public currentFrame: number;
+
+    @observable
+    public orgStartNo: number;
+
+    @observable
+    public orgEndNo: number;
+
+    @observable
     public startNo: number;
 
     @observable
@@ -54,6 +63,12 @@ export class AppState {
 
     @observable
     public pulseFeatureLayerChanged: boolean;
+
+    @observable
+    public setlists: any[];
+
+    @observable
+    public recentSetlist: any;
 
     public config: any;
 
