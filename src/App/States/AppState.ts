@@ -68,7 +68,13 @@ export class AppState {
     public setlists: any[];
 
     @observable
+    public displaySetlists: any[];
+
+    @observable
     public recentSetlist: any;
+
+    @observable
+    public nextSetlist: any;
 
     public config: any;
 

@@ -9,6 +9,7 @@
         "apiKey": "7_Q_PB-S4jb5GoJjH2a71IPw9CtiZLi1GM0-",
         "artists": "artists?artistName=",
         "setlists": "setlists?artistName=",
+        "displayNumberOfSetlists": 5,
         "demoMode": true,
         "demoUrl": "http://localhost:3000/demoT"
     }

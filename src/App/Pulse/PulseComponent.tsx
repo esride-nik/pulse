@@ -159,6 +159,37 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
     }
 
+    private setCurrentSetlists(now: number) {
+        if (now && this.props.appState.setlists.length>0) {
+            let setlistsBeforeNow = this.props.appState.setlists.filter((setlist) => {
+                let floorNow = Math.floor(now);
+                if (setlist.eventDate<=floorNow) {
+                    return setlist;
+                }
+            });
+            this.props.appState.displaySetlists = setlistsBeforeNow.slice(0, this.props.appState.config.setlistFmConnector.displayNumberOfSetlists+1);
+            if (setlistsBeforeNow.length>0) {
+                const reducer = (max, cur) => Math.max( max, cur );
+                let eventDateBeforeNow = setlistsBeforeNow.map((setlist) => setlist.eventDate).reduce(reducer, -Infinity);
+                this.props.appState.recentSetlist = setlistsBeforeNow.filter((setlist) => setlist.eventDate===eventDateBeforeNow)[0];
+            }
+            let setlistsAfterNow = this.props.appState.setlists.filter((setlist) => {
+                let floorNow = Math.floor(now);
+                if (setlist.eventDate>floorNow) {
+                    return setlist;
+                }
+            });
+            if (setlistsAfterNow.length>0) {
+                const reducer = (max, cur) => Math.min( max, cur );
+                let eventDateAfterNow = setlistsAfterNow.map((setlist) => {
+                    console.log("AFTER NOW", setlist.eventDate);
+                    return setlist.eventDate;
+                }).reduce(reducer, Infinity);
+                this.props.appState.nextSetlist = setlistsAfterNow.filter((setlist) => setlist.eventDate===eventDateAfterNow)[0];
+            }
+        }
+    }
+
     private animate = (startValue: number) => {
         this.animating = true;
         this.props.appState.currentFrame = startValue;
@@ -170,6 +201,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             }
 
             this.props.appState.currentFrame += this.props.appState.stepNumber;
+            this.setCurrentSetlists(this.props.appState.currentFrame);
 
             if (this.props.appState.currentFrame > this.props.appState.endNo) {
                 this.props.appState.currentFrame = this.props.appState.startNo;
@@ -179,7 +211,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             if (this.animating) {
                 this.setRenderer(this.props.appState.currentFrame);
                 if (this.props.appState.fieldToAnimate == this.props.appState.config.setlistFmConnector.setlistDateField) {
-                    this.props.appState.displayNow = this.props.appState.nls[this.props.appState.fieldToAnimate] + ": " 
+                    this.props.appState.displayNow = this.props.appState.nls["now"] + ": " 
                         + Pulse.adjustAndFormatDate(this.props.appState.currentFrame, this.props.appState.orgStartNo, this.props.appState.orgEndNo);
                 }
                 else {
@@ -337,30 +369,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
     }
 
-    getRecentSetlist(now: number): any {
-        if (now) {
-            let setlistsBeforeNow = this.props.appState.setlists.filter((setlist) => {
-                let floorNow = Math.floor(now);
-                if (setlist.eventDate<=floorNow) {
-                    return setlist;
-                }
-            });
-            if (setlistsBeforeNow.length>0) {
-                const reducer = (max, cur) => Math.max( max, cur );
-                let eventDateBeforeNow = setlistsBeforeNow.map((setlist) => setlist.eventDate).reduce(reducer, -Infinity);
-                return setlistsBeforeNow.filter((setlist) => setlist.eventDate===eventDateBeforeNow)[0];
-            }
-            return {};
-        }
-        return {};
-    }
 
     public render() {
         let { displayNow } = this.props.appState;
         const { key } = this.props;
         
-        let recentSetlist = this.getRecentSetlist(this.props.appState.currentFrame);
-
         let disabled = false;
         if (!this.props.appState.pulseSourceLoaded) {
             disabled = true;
@@ -407,7 +420,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     <Badge variant="info" id="displayNow">{displayNow}</Badge>
                 </div>
                 <div className="pulseBottom">
-                    <SetlistDetailsComponent recentSetlist={recentSetlist} />
+                    <SetlistDetailsComponent />
                 </div>
             </Container>
         );

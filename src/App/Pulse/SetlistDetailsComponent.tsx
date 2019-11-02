@@ -8,8 +8,7 @@ import { Pulse } from './Pulse';
 @inject('appState')
 @observer
 export class SetlistDetailsComponent extends React.Component<{
-    appState?: AppState,
-    recentSetlist: any
+    appState?: AppState
 }> {
     setlistFmConnector: any;
     artist: React.RefObject<unknown>;
@@ -23,10 +22,10 @@ export class SetlistDetailsComponent extends React.Component<{
 
     public render() {
         let setlistDetailsNode;
-        if (this.props.appState && this.props.appState.setlists) {
-            setlistDetailsNode = this.props.appState.setlists.map((setlist: any) => {
+        if (this.props.appState && this.props.appState.displaySetlists) {
+            setlistDetailsNode = this.props.appState.displaySetlists.map((setlist: any) => {
                 let detailsClass = "notCurrent";
-                if (this.props.recentSetlist.id === setlist.id) {
+                if (this.props.appState.recentSetlist && this.props.appState.recentSetlist.id === setlist.id) {
                     detailsClass = "current";
                 }
 
