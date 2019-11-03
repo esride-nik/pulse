@@ -13,6 +13,8 @@ import { Point, Extent, Geometry } from 'esri/geometry';
 import Collection from 'esri/core/Collection';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 
+const venueFeaturesLayerId = "venueFeatures";
+
 @inject('appState')
 @observer
 export class SetlistFmComponent extends React.Component<{
@@ -191,7 +193,7 @@ export class SetlistFmComponent extends React.Component<{
             geometryType: "point",
             spatialReference: { wkid: 4326 },
             source: graphicsCollection,
-            id: "venueFeatures",
+            id: venueFeaturesLayerId,
             title: "Venues",
             fullExtent: fullExtent
         });

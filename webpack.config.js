@@ -135,7 +135,7 @@ var webpackConfig = {
     extensions: [".ts", ".tsx", ".js", ".scss", ".css"]
   },
   node: {
-    process: true,
+    process: false,
     global: false,
     fs: "empty"
   },

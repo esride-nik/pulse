@@ -15,6 +15,12 @@ import { Knob } from 'react-rotary-knob';
 
 import { SetlistDetailsComponent } from './SetlistDetailsComponent';
 import Graphic from 'esri/Graphic';
+import GraphicsLayer from 'esri/layers/GraphicsLayer';
+import Geometry from 'esri/geometry/Geometry';
+import Polyline from 'esri/geometry/Polyline';
+import geometryEngineAsync from 'esri/geometry/geometryEngineAsync';
+
+const venueFeaturesLayerId = "venueFeatures";
 
 interface PulseComponentProps {
     appState?: AppState,
@@ -45,6 +51,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     @observable
     private flNameString: string = "";
     lastSetlist: any;
+    connectionsLayer: GraphicsLayer;
 
     constructor(props: PulseComponentProps) {
         super(props);
@@ -88,6 +95,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             this.flUrl.current.value = this.props.appState.config.defaultService;
         }
 
+        this.connectionsLayer = new GraphicsLayer({
+            id: "connectionsLayer"
+        });
+        this.map.add(this.connectionsLayer);
+
         this.mapView.when(() => {
             this.mapView.watch("stationary", this.updateMapLongLat);
 
@@ -116,7 +128,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 this.props.appState.pulseFeatureLayer = new FeatureLayer({
                     url: this.flUrl.current.value
                 });
-                this.map.removeAll()
+                this.map.findLayerById("")
                 this.map.add(this.props.appState.pulseFeatureLayer)
             }
         }
@@ -251,7 +263,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     public setSetlistFmFeatureLayer = (featureLayer: FeatureLayer, fieldToAnimate: string, fieldToAnimateMinValue: number, fieldToAnimateMaxValue: number) => {
         this.animationTime = 100-this.animationSpeed.current.value;
-        this.map.removeAll();
+        this.map.remove(this.map.findLayerById(venueFeaturesLayerId));
         this.map.add(this.props.appState.pulseFeatureLayer);
         this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
         this.props.appState.pulseSourceLoaded = true;
@@ -346,7 +358,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             this.props.appState.pulseFeatureLayer = new FeatureLayer({
                 url: this.flUrl.current.value
             });
-            this.map.removeAll();
+            this.map.remove(this.map.findLayerById(venueFeaturesLayerId));
             this.map.add(this.props.appState.pulseFeatureLayer);
             this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(this.props.appState.pulseFeatureLayer.geometryType);
 
@@ -385,12 +397,31 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             if (this.props.appState.recentSetlist && this.props.appState.pulseFeatureLayer) {
                 let nextSetlistLocationQueryParams = this.props.appState.pulseFeatureLayer.createQuery();
                 nextSetlistLocationQueryParams.where = "OBJECTID = " + this.lastSetlist.OBJECTID + " OR OBJECTID = " + this.props.appState.recentSetlist.OBJECTID;
+                nextSetlistLocationQueryParams.where += this.props.appState.recentSetlist.OBJECTID!=this.props.appState.nextSetlist.OBJECTD ? " OR OBJECTID = " + this.props.appState.nextSetlist.OBJECTID : "";
                 this.props.appState.pulseFeatureLayer.queryFeatures(nextSetlistLocationQueryParams).then((res: any) => {
-                    let geometries = res.features.map((feature: Graphic) => feature.geometry);
-                    console.log(geometries);
                     if (res.features.length>0) {
-                        this.mapView.goTo({
-                            target: geometries
+                        let setlistPoints: Point[] = res.features.map((feature: Graphic) => feature.geometry);
+                        let setlistPaths = setlistPoints.map((setlistPoint: Point) => [setlistPoint.x, setlistPoint.y]);
+                        let setlistPathsGraphic = new Graphic({
+                            geometry: new Polyline({
+                                paths: [setlistPaths]
+                            }),
+                            symbol: {
+                                type: "simple-line",
+                                style: "short-dot",
+                                cap: "round",
+                                join: "bevel",
+                                miterLimit: 30,
+                                width: 1,
+                                color: [255, 190, 232, 1]
+                              }
+                        });
+                        this.connectionsLayer.add(setlistPathsGraphic);
+                        // buffer does not work with polyline!
+                        geometryEngineAsync.geodesicBuffer(setlistPoints, 100, "kilometers", true).then((setlistPathsGraphicBuffer: any) => {
+                            this.mapView.goTo({
+                                target: setlistPathsGraphicBuffer
+                            });
                         });
                     }
                 });
