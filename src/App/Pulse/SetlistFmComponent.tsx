@@ -56,8 +56,6 @@ export class SetlistFmComponent extends React.Component<{
     }
 
     public querySetlists = () => {
-        this.props.appState.setlists = [];
-        this.props.appState.displaySetlists = [];
         
         this.props.stopAnimation();
         
@@ -79,6 +77,7 @@ export class SetlistFmComponent extends React.Component<{
             url = this.props.appState.config.setlistFmConnector.demoUrl;
         }
         axios.get(url, options).then((response: any) => {
+            this.props.appState.setlists = [];
             if (response.data && response.data.setlist) {
                 let graphics: Graphic[] = [];
                 response.data.setlist.map((setlist: any) => {

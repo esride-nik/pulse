@@ -183,7 +183,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     return setlist;
                 }
             });
-            this.props.appState.displaySetlists = setlistsBeforeNow.slice(0, this.props.appState.config.setlistFmConnector.displayNumberOfSetlists+1);
+            this.props.appState.displaySetlists = setlistsBeforeNow; //.slice(0, this.props.appState.config.setlistFmConnector.displayNumberOfSetlists+1);
             if (setlistsBeforeNow.length>0) {
                 const reducer = (max, cur) => Math.max( max, cur );
                 let eventDateBeforeNow = setlistsBeforeNow.map((setlist) => setlist.eventDate).reduce(reducer, -Infinity);
