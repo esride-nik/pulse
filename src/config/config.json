@@ -10,6 +10,8 @@
         "artists": "artists?artistName=",
         "setlists": "setlists?artistName=",
         "displayNumberOfSetlists": 5,
+        "displayNumberOfConnections": 8,
+        "displayConnectionsColor": [255, 190, 232],
         "demoMode": true,
         "demoUrl": "http://localhost:3000/demoT"
     }
