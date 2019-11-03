@@ -1,9 +1,16 @@
 {
     "defaultService": "https://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/hurricanes/FeatureServer/0",
     "setlistFm": {
-        "baseUrl": "http://localhost:3000/",
         "baseUrl": "https://setlist-fm-connector.herokuapp.com/",
+        "baseUrl": "http://localhost:3000/",
         "apiKey": "7_Q_PB-S4jb5GoJjH2a71IPw9CtiZLi1GM0-",
-        "searchArtist": "artist?name="
+        "artists": "artists?artistName=",
+        "setlists": "setlists?artistName=",
+        "setlistDateField": "eventDate",
+        "displayNumberOfSetlists": 5,
+        "displayNumberOfConnections": 8,
+        "displayConnectionsColor": [255, 190, 232],
+        "demoMode": false,
+        "demoUrl": "http://localhost:3000/demoT"
     }
 }
