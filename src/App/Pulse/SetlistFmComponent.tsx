@@ -150,6 +150,18 @@ export class SetlistFmComponent extends React.Component<{
         return extent;
     }
 
+    private setlistContent = (setlistFeature: any) => {
+        let setlistGraphic: Graphic = setlistFeature.graphic;
+        let objectId = setlistGraphic.attributes.OBJECTID;
+        let setlist = this.props.appState.setlists.filter((setlist: any) => setlist.OBJECTID==objectId)[0];
+        console.log("### setlistContent", setlistGraphic, setlist);
+        return ('<div>'
+        + 'Artist: <b><a href="' + setlist.artist.url + '" target="_blank">' + setlist.artist.name + '</a></b><br/>'
+        + 'Disambiguation: ' + setlist.artist.disambiguation + '<br/>'
+        + 'Venue: <a href="' + setlist.venue.url + '" target="_blank">' + setlist.venue.name + ', ' + setlist.venue.city.name + ', ' + setlist.venue.city.country.code + '</a><br/>'
+        + '</div>');
+    }
+
     private venueGraphicsToFeatureLayer(venueGraphics: Graphic[]) {
         let fullExtent: Extent = new Extent();
         venueGraphics.map((venueGraphic: Graphic) => {
@@ -188,7 +200,7 @@ export class SetlistFmComponent extends React.Component<{
                 type: "string"
             }],
             popupTemplate: {
-              content: "<a href='{url}'></a>"
+              content: this.setlistContent
             },
             objectIdField: "OBJECTID",
             geometryType: "point",
