@@ -21,7 +21,7 @@ export class SetlistDetailsComponent extends React.Component<{
     }
 
     public render() {
-        let setlistDetailsNode;
+        let setlistDetailsNode = [];
         if (this.props.appState && this.props.appState.displaySetlists) {
             setlistDetailsNode = this.props.appState.displaySetlists.map((setlist: any) => {
                 let detailsClass = "notCurrent";

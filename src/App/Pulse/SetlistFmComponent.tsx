@@ -57,6 +57,8 @@ export class SetlistFmComponent extends React.Component<{
 
     public querySetlists = () => {
         this.props.appState.setlists = [];
+        this.props.appState.displaySetlists = [];
+        
         this.props.stopAnimation();
         
         const { apiKey, baseUrl, setlists } = this.props.appState.config.setlistFmConnector;

@@ -12,7 +12,7 @@
         "displayNumberOfSetlists": 5,
         "displayNumberOfConnections": 8,
         "displayConnectionsColor": [255, 190, 232],
-        "demoMode": true,
+        "demoMode": false,
         "demoUrl": "http://localhost:3000/demoT"
     }
 }
