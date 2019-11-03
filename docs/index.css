@@ -1,0 +1,185 @@
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+
+.pulseCol #displayNow {
+  font-size: xx-large;
+  width: 100%;
+  margin: 10px 0px;
+  text-align: left;
+}
+
+.pulseCol .row {
+  margin: 0px;
+}
+
+.pulseCol .tab-content {
+  padding: 20px 10px;
+  border-color: #dee2ed;
+  border-radius: 0 0 .25rem .25rem;
+  border: 1px solid #dee2ed;
+  border-top: transparent;
+}
+
+.pulseCol .row input,
+.pulseCol .row div {
+  margin: 0px 0px 5px 0px;
+}
+
+.extra-tab {
+  padding: 20px 10px;
+  border-color: #dee2ed;
+  border-radius: 0 0 .25rem .25rem;
+  border: 1px solid #dee2ed;
+  margin-top: 10px !important;
+}
+
+.extra-tab-label {
+  padding-top: 17px;
+  color: grey;
+}
+
+.extra-tab-value {
+  padding-top: 10px;
+  width: 50px;
+  height: 30px;
+}
+
+.setlistFmForm .col {
+  padding: 0px 5px 0px 0px !important;
+}
+
+.btn {
+  width: 50px;
+  height: 50px;
+  margin-right: 5px;
+}
+
+.container {
+  margin: 0px;
+  padding: 0px;
+}
+
+
+.setlistDetails {
+  height: 100vw;
+  overflow: scroll;
+}
+
+.current {
+  background-color: #fff;
+  background-image: linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px), linear-gradient(#eee 0.1em, transparent 0.1em);
+  background-size: 100% 1.2em;
+}
+
+.notCurrent {
+  background-color: aliceblue;
+}
+
+
+.pulseCol #displayNow {
+  font-size: xx-large;
+  width: 100%;
+  margin: 10px 0px;
+  text-align: left;
+}
+
+.pulseCol .row {
+  margin: 0px;
+}
+
+.pulseCol .tab-content {
+  padding: 20px 10px;
+  border-color: #dee2ed;
+  border-radius: 0 0 .25rem .25rem;
+  border: 1px solid #dee2ed;
+  border-top: transparent;
+}
+
+.pulseCol .row input,
+.pulseCol .row div {
+  margin: 0px 0px 5px 0px;
+}
+
+.extra-tab {
+  padding: 20px 10px;
+  border-color: #dee2ed;
+  border-radius: 0 0 .25rem .25rem;
+  border: 1px solid #dee2ed;
+  margin-top: 10px !important;
+}
+
+.extra-tab-label {
+  padding-top: 17px;
+  color: grey;
+}
+
+.extra-tab-value {
+  padding-top: 10px;
+  width: 50px;
+  height: 30px;
+}
+
+.setlistFmForm .col {
+  padding: 0px 5px 0px 0px !important;
+}
+
+.btn {
+  width: 50px;
+  height: 50px;
+  margin-right: 5px;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  font-family: Roboto, sans-serif;
+  overflow: hidden;
+  font-size: 0.8rem;
+}
+
+#root,
+.app {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.pulseCol {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  padding: 10px;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.mapCol {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  border-right: 1px #c4c4c4 solid;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+
+
+/*# sourceMappingURL=index.css.map*/
