@@ -15,9 +15,8 @@ export class Pulse {
         return element ? element.value : "";
     }
 
-    public static formatDate(date: Date, orgStartNo: number, orgEndNo: number): string {
+    public static formatDate(date: Date): string {
         let adjustedAndFormattedDate = Pulse.formatTwoDigits(date.getDate()) + "." + Pulse.formatTwoDigits(date.getMonth()) + "." + date.getFullYear();
-
         return adjustedAndFormattedDate;
     }
 
@@ -34,7 +33,7 @@ export class Pulse {
 
     public static adjustAndFormatDate(timestamp: number, orgStartNo: number, orgEndNo: number): string {
         let adjustedTimestamp = this.adjustCurrentFrame(timestamp, orgStartNo, orgEndNo);
-        let adjustedAndFormattedDate = this.formatDate(new Date(adjustedTimestamp), orgStartNo, orgEndNo);
+        let adjustedAndFormattedDate = this.formatDate(new Date(adjustedTimestamp));
         return adjustedAndFormattedDate;
     }
 

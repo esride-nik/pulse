@@ -12,6 +12,8 @@ import Graphic from 'esri/Graphic';
 import { Point, Extent, Geometry } from 'esri/geometry';
 import Collection from 'esri/core/Collection';
 import FeatureLayer from 'esri/layers/FeatureLayer';
+import { Pulse } from './Pulse';
+import { array } from 'prop-types';
 
 const venueFeaturesLayerId = "venueFeatures";
 
@@ -150,16 +152,47 @@ export class SetlistFmComponent extends React.Component<{
         return extent;
     }
 
+    private setlistSets(setlist: any) {
+        let setlistString: string = "";
+        let songBaseUrl = setlist.artist.url.replace("setlists", "stats/songs") + "?song=";
+        if (setlist.sets.set.length>0) {
+            let set = setlist.sets.set.map((set: any) => {
+                let songs = set.song.filter((song: any) => song.name.length > 0);
+                return songs.map((song: any) => {
+                    let songString = '<li>';
+                    songString += !song.tape ? '<a href="' + songBaseUrl + song.name.replace(" ", "+") + '" target="_blank">' : '';
+                    songString += song.name;
+                    songString += !song.tape ? '</a>' : '';
+                    songString += song.info ? '<small>' + song.info + '</small>' : '';
+                    songString += '</li>';
+                    return songString;
+                });
+            });
+            const reducer = (accumulator, currentValue) => accumulator + currentValue;
+            setlistString = '<a href="' + setlist.url + '" target="_blank">Set</a>: <ul>' + set[0].reduce(reducer) + '</ul><br/>';
+        }
+        return setlistString;
+    }
+
+    //https://www.setlist.fm/setlists/black-peaks-6bd89236.html
+    //https://www.setlist.fm/stats/songs/black-peaks-6bd89236.html?song=Eternal+Light
+
     private setlistContent = (setlistFeature: any) => {
         let setlistGraphic: Graphic = setlistFeature.graphic;
         let objectId = setlistGraphic.attributes.OBJECTID;
         let setlist = this.props.appState.setlists.filter((setlist: any) => setlist.OBJECTID==objectId)[0];
-        console.log("### setlistContent", setlistGraphic, setlist);
         return ('<div>'
-        + 'Artist: <b><a href="' + setlist.artist.url + '" target="_blank">' + setlist.artist.name + '</a></b><br/>'
         + 'Disambiguation: ' + setlist.artist.disambiguation + '<br/>'
         + 'Venue: <a href="' + setlist.venue.url + '" target="_blank">' + setlist.venue.name + ', ' + setlist.venue.city.name + ', ' + setlist.venue.city.country.code + '</a><br/>'
+        + this.setlistSets(setlist)
         + '</div>');
+    }
+
+    private setlistTitle = (setlistFeature: any) => {
+        let setlistGraphic: Graphic = setlistFeature.graphic;
+        let objectId = setlistGraphic.attributes.OBJECTID;
+        let setlist = this.props.appState.setlists.filter((setlist: any) => setlist.OBJECTID==objectId)[0];
+        return ('<h2>' + Pulse.formatDate(new Date(setlist.eventDate)) + ' | <a href="' + setlist.artist.url + '" target="_blank">' + setlist.artist.name + '</a></h2>');
     }
 
     private venueGraphicsToFeatureLayer(venueGraphics: Graphic[]) {
@@ -200,7 +233,8 @@ export class SetlistFmComponent extends React.Component<{
                 type: "string"
             }],
             popupTemplate: {
-              content: this.setlistContent
+                title: this.setlistTitle,
+                content: this.setlistContent
             },
             objectIdField: "OBJECTID",
             geometryType: "point",
