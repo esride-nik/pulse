@@ -69,6 +69,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
         this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
         this.intervalSpeed = this.props.appState.config.defaultIntervalSpeed;
+        this.props.appState.automaticZoom = true;
     }
 
     private setAnimationSpeed = (a: any) => {
@@ -380,6 +381,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
     }
 
+    private toggleZoom = () => {
+        this.props.appState.automaticZoom = !this.props.appState.automaticZoom;
+    }
+
 
     public render() {
         let { displayNow } = this.props.appState;
@@ -388,6 +393,11 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         let disabled = false;
         if (!this.props.appState.pulseSourceLoaded) {
             disabled = true;
+        }
+
+        let onOff = "outline-secondary";
+        if (!this.props.appState.automaticZoom) {
+            onOff = "secondary";
         }
 
         if (!this.lastSetlist) {
@@ -417,12 +427,14 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                               }
                         });
                         this.connectionsLayer.add(setlistPathsGraphic);
-                        // buffer does not work with polyline!
-                        geometryEngineAsync.geodesicBuffer(setlistPoints, 100, "kilometers", true).then((setlistPathsGraphicBuffer: any) => {
-                            this.mapView.goTo({
-                                target: setlistPathsGraphicBuffer
+                        if (this.props.appState.automaticZoom) {
+                            // buffer does not work with polyline!
+                            geometryEngineAsync.geodesicBuffer(setlistPoints, 100, "kilometers", true).then((setlistPathsGraphicBuffer: any) => {
+                                this.mapView.goTo({
+                                    target: setlistPathsGraphicBuffer
+                                });
                             });
-                        });
+                        }
                     }
                 });
             }
@@ -453,6 +465,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                     <Row className="extra-tab">
                         <Button variant="light" id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
                         <Button variant="light" id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
+                        <Button variant={onOff} id="zoom" onClick={this.toggleZoom} disabled={disabled}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" class="svg-icon"><path d="M20 20h12v3h-6.915L32 29.723v2.109l-.168.168h-2.117L23 25.09V32h-3V20zM0 23h6.915L0 29.723v2.109L.168 32h2.117L9 25.09V32h3V20H0v3zM9 6.91L2.285 0H.168L0 .168v2.109L6.915 9H0v3h12V0H9v6.91zM32 .168L31.832 0h-2.117L23 6.91V0h-3v12h12V9h-6.915L32 2.277V.168z"/></svg></Button>
                     </Row>
 
                     <Row className="extra-tab">

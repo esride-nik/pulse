@@ -20,7 +20,7 @@ export class AppState {
     }
 
     @observable
-    public appLevelLoading = false
+    public appLevelLoading = false;
 
     @observable
     public map: Map;
@@ -51,6 +51,9 @@ export class AppState {
 
     @observable
     public stepNumber: number;
+
+    @observable
+    public automaticZoom: boolean;
 
     @observable
     public pulseSourceLoaded: boolean;
