@@ -174,9 +174,6 @@ export class SetlistFmComponent extends React.Component<{
         return setlistString;
     }
 
-    //https://www.setlist.fm/setlists/black-peaks-6bd89236.html
-    //https://www.setlist.fm/stats/songs/black-peaks-6bd89236.html?song=Eternal+Light
-
     private setlistContent = (setlistFeature: any) => {
         let setlistGraphic: Graphic = setlistFeature.graphic;
         let objectId = setlistGraphic.attributes.OBJECTID;

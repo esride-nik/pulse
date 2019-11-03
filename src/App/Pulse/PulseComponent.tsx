@@ -471,7 +471,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         }
 
         return (
-            <Container className="pulse100">
+            <Container>
                 <div className="pulseTop">
                     <Tabs defaultActiveKey="setlistfm" id="pulse-tab">
                         <Tab eventKey="setlistfm" title="Setlist.fm">
@@ -511,9 +511,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
                     <Badge variant="dark" id="displayNow">{displayNow}</Badge>
                 </div>
-                <div className="pulseBottom">
-                    <SetlistDetailsComponent />
-                </div>
+                <SetlistDetailsComponent />
             </Container>
         );
     }

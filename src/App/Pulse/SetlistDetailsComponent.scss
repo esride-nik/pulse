@@ -1,6 +1,7 @@
 .setlistDetails {
-    height: 100vw;
-    overflow:scroll;
+    overflow-y: scroll;
+    margin-top: 5px;
+    max-height: 80vh;
 }
 
 .current {
