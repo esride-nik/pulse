@@ -88,6 +88,12 @@
   margin-right: 5px;
 }
 
+.esri-time-slider__previous,
+.esri-time-slider__animation,
+.esri-time-slider__next {
+  display: none;
+}
+
 
 * {
   box-sizing: border-box;
