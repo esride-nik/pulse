@@ -526,18 +526,8 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         <Button variant={playOnOff} id="play" onClick={this.play} disabled={disabled}>&#9658;</Button>
                         <Button variant={stopOnOff} id="stop" onClick={this.stopAnimation} disabled={disabled}>&#9632;</Button>
                         <Button variant={zoomOnOff} id="zoom" onClick={this.toggleZoom} disabled={zoomDisabled}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32" className="svg-icon"><path d="M20 20h12v3h-6.915L32 29.723v2.109l-.168.168h-2.117L23 25.09V32h-3V20zM0 23h6.915L0 29.723v2.109L.168 32h2.117L9 25.09V32h3V20H0v3zM9 6.91L2.285 0H.168L0 .168v2.109L6.915 9H0v3h12V0H9v6.91zM32 .168L31.832 0h-2.117L23 6.91V0h-3v12h12V9h-6.915L32 2.277V.168z"/></svg></Button>
-                    </Row>
-
-                    <Row className="extra-tab">
-                        <Col className="extra-tab-label">
-                            Animation speed
-                        </Col>
-                        <Col>
                             <Knob onChange={this.setAnimationSpeed} unlockDistance={20} min={0} max={100} defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} fill="#69dcff"/>
-                        </Col>
-                        <Col className="extra-tab-value">
                             <Form.Control type="text" id="animation-time" className="animation-time" readOnly defaultValue={this.props.appState.config.defaultAnimationTime} ref={this.animationSpeed} />
-                        </Col>
                     </Row>
 
                     {/* <Badge variant="dark" id="displayNow">{displayNow}</Badge> */}

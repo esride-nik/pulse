@@ -63,13 +63,13 @@
     padding:0px 5px 0px 0px !important;
 }
 
-.btn {
+.btn, #animation-time {
     width:$btn_w;
     height:$btn_h;
 }
 
-.controlBtns .btn {
-    margin-right: $default_margin_r;
+.controlBtns .btn, .controlBtns div {
+    margin-right: $default_margin_r !important;
 }
 
 .esri-time-slider__previous, .esri-time-slider__animation, .esri-time-slider__next {
