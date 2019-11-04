@@ -19,6 +19,9 @@ import GraphicsLayer from 'esri/layers/GraphicsLayer';
 import Geometry from 'esri/geometry/Geometry';
 import Polyline from 'esri/geometry/Polyline';
 import geometryEngineAsync from 'esri/geometry/geometryEngineAsync';
+import TimeSlider from 'esri/widgets/TimeSlider';
+import TimeExtent from 'esri/TimeExtent';
+import TimeInterval from 'esri/TimeInterval';
 
 const venueFeaturesLayerId = "venueFeatures";
 
@@ -54,6 +57,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
     connectionsLayer: GraphicsLayer;
     setlistPathsGraphics: Graphic[] = [];
     pulseMode: string;
+    timeSlider: TimeSlider;
 
     constructor(props: PulseComponentProps) {
         super(props);
@@ -115,6 +119,18 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 target: pt,
                 zoom: this.mapLongLatZoom[2]
             })
+
+            this.timeSlider = new TimeSlider({
+                view: this.mapView,
+                stops: {
+                    interval: new TimeInterval({
+                        "unit": "days",
+                        "value": 1
+                    })
+                },
+                mode: "cumulative-from-start"
+            });
+            this.mapView.ui.add(this.timeSlider, "bottom-right");
         })
     }
 
@@ -217,6 +233,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
             this.props.appState.currentFrame += this.props.appState.stepNumber;
             this.setCurrentSetlists(this.props.appState.currentFrame);
 
+            this.timeSlider.values = [
+                new Date(this.props.appState.currentFrame)
+            ];
+
             if (this.props.appState.currentFrame > this.props.appState.endNo) {
                 this.props.appState.currentFrame = this.props.appState.startNo;
             }
@@ -273,6 +293,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.props.appState.pulseSourceLoaded = true;
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
         this.setRenderer(this.props.appState.startNo);
+        this.timeSlider.fullTimeExtent = featureLayer.timeInfo.fullTimeExtent;
     }
 
     private changeFieldSelection = () => {
@@ -509,7 +530,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         </Col>
                     </Row>
 
-                    <Badge variant="dark" id="displayNow">{displayNow}</Badge>
+                    {/* <Badge variant="dark" id="displayNow">{displayNow}</Badge> */}
                 </div>
                 <SetlistDetailsComponent />
             </Container>

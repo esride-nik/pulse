@@ -14,6 +14,7 @@ import Collection from 'esri/core/Collection';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import { Pulse } from './Pulse';
 import { array } from 'prop-types';
+import TimeExtent from 'esri/TimeExtent';
 
 const venueFeaturesLayerId = "venueFeatures";
 
@@ -239,12 +240,21 @@ export class SetlistFmComponent extends React.Component<{
             source: graphicsCollection,
             id: venueFeaturesLayerId,
             title: "Venues",
-            fullExtent: fullExtent
+            fullExtent: fullExtent,
+            timeInfo: {
+                startField: "eventDate"
+            }
         });
 
         let eventDates: number[] = venueGraphics.map((graphic: Graphic) => graphic.attributes.eventDate);
         this.props.appState.startNo = Math.min(...eventDates);
         this.props.appState.endNo = Math.max(...eventDates);
+        
+        venuesFeatureLayer.timeInfo.fullTimeExtent = new TimeExtent({
+            start: new Date(this.props.appState.startNo),
+            end: new Date(this.props.appState.endNo)
+          });
+
         this.props.appState.fieldToAnimate = "eventDate";
         this.props.appState.pulseFeatureLayer = venuesFeatureLayer;
         
