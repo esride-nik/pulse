@@ -1,3 +1,5 @@
+@import "./const.scss";
+
 .pulseCol #displayNow {
     font-size: xx-large;
     width: 100%;
@@ -15,6 +17,7 @@
     border-radius: 0 0 .25rem .25rem;
     border: 1px solid #dee2ed;
     border-top: transparent;
+    background:#fff;
 }
 
 .pulseCol .row input, .pulseCol .row div {
@@ -31,6 +34,7 @@
     border-radius: 0 0 .25rem .25rem;
     border: 1px solid #dee2ed;
     margin-top:5px !important;
+    background:#fff;
 }
 .extra-tab-label {
     padding-top:17px;
@@ -42,14 +46,30 @@
     height: 30px;
 }
 
+#knob circle {
+    fill: #69dcff;
+}
+#knob path {
+    fill: #666;
+}
+#zoom svg path {
+    fill: #69dcff;
+}
+.btn-secondary {
+    color: #69dcff;
+}
+
 .setlistFmForm .col {
     padding:0px 5px 0px 0px !important;
 }
 
 .btn {
-    width:50px;
-    height:50px;
-    margin-right:5px;
+    width:$btn_w;
+    height:$btn_h;
+}
+
+.controlBtns .btn {
+    margin-right: $default_margin_r;
 }
 
 .esri-time-slider__previous, .esri-time-slider__animation, .esri-time-slider__next {

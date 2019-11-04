@@ -1,3 +1,5 @@
+@import "./const.scss";
+
 .container {
     margin:0px;
     padding:0px;
@@ -5,4 +7,10 @@
 
 .esri-popup__content a {
     text-decoration: underline;
+}
+
+#artist {
+    height: $btn_h;
+    width: calc(100% - #{$default_margin_r} - #{$btn_w});
+    margin-right: $default_margin_r;
 }
