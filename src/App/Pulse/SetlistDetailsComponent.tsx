@@ -40,7 +40,7 @@ export class SetlistDetailsComponent extends React.Component<{
                     {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
                     <Card.Body>
                         <Card.Title>{Pulse.adjustAndFormatDate(setlist.eventDate, this.props.appState.orgStartNo, this.props.appState.orgEndNo)} | {cityAndCountry} | {setlist.venue.name}</Card.Title>
-                        <Card.Subtitle>{setlist.artist.name} | {setlist.id}</Card.Subtitle>
+                        <Card.Subtitle>{setlist.artist.name}</Card.Subtitle>
                         <Card.Text>
                             {setlistInfo}
                         </Card.Text>
