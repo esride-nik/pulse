@@ -13,6 +13,7 @@
         "displayNumberOfConnections": 8,
         "displayConnectionsColor": [255, 190, 232],
         "demoMode": false,
-        "demoUrl": "http://localhost:3000/demoT"
+        "demoUrl": "http://localhost:3000/demoT",
+        "randomArtists": ["Black Peaks", "John Denver", "Jamiroquai", "Mutemath", "Periphery", "Pat Metheny", "The Band", "Third Eye Blind", "Yes", "The Beatles", "Tycho", "The Prodigy", "Mutemath", "David Bowie", "Genesis", "Britney Spears"]
     }
 }

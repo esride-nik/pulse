@@ -13,6 +13,12 @@
   text-decoration: underline;
 }
 
+#artist {
+  height: 50px;
+  width: calc(100% - 5px - 50px);
+  margin-right: 5px;
+}
+
 
 .setlistDetails {
   overflow-y: scroll;
@@ -48,6 +54,7 @@
   border-radius: 0 0 .25rem .25rem;
   border: 1px solid #dee2ed;
   border-top: transparent;
+  background: #fff;
 }
 
 .pulseCol .row input,
@@ -65,6 +72,7 @@
   border-radius: 0 0 .25rem .25rem;
   border: 1px solid #dee2ed;
   margin-top: 5px !important;
+  background: #fff;
 }
 
 .extra-tab-label {
@@ -78,14 +86,35 @@
   height: 30px;
 }
 
+#knob circle {
+  fill: #69dcff;
+}
+
+#knob path {
+  fill: #666;
+}
+
+#zoom svg path {
+  fill: #69dcff;
+}
+
+.btn-secondary {
+  color: #69dcff;
+}
+
 .setlistFmForm .col {
   padding: 0px 5px 0px 0px !important;
 }
 
-.btn {
+.btn,
+#animation-time {
   width: 50px;
   height: 50px;
-  margin-right: 5px;
+}
+
+.controlBtns .btn,
+.controlBtns div {
+  margin-right: 5px !important;
 }
 
 .esri-time-slider__previous,
