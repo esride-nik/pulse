@@ -27,9 +27,13 @@ export class SetlistDetailsComponent extends React.Component<{
                 }
 
                 let cityAndCountry = "";
-                cityAndCountry += setlist.venue.city ? setlist.venue.city.name : "";
-                cityAndCountry += setlist.venue.city && setlist.venue.city.stateCode.length>0 ? ", "+setlist.venue.city.stateCode : "";
-                cityAndCountry += setlist.venue.city && setlist.venue.city.country && setlist.venue.city.country.code.length>0 ? ", "+setlist.venue.city.country.code : "";
+                if (setlist && setlist.venue && setlist.venue.city) {
+                    cityAndCountry += setlist.venue.city ? setlist.venue.city.name : "";
+                    if (setlist.venue.city.country && setlist.venue.city.country.code) {
+                        cityAndCountry += setlist.venue.city.country.code === "US" && setlist.venue.city.stateCode && setlist.venue.city.stateCode.length>0 ? ", "+setlist.venue.city.stateCode : "";
+                        cityAndCountry += setlist.venue.city.country.code.length>0 ? ", "+setlist.venue.city.country.code : "";
+                    }
+                }
 
                 let setlistInfo = "";
                 if (setlist.info.length>0) {
@@ -39,12 +43,12 @@ export class SetlistDetailsComponent extends React.Component<{
                 return <Card className={detailsClass} key={setlist.id}>
                     {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
                     <Card.Body>
-                        <Card.Title>{Pulse.adjustAndFormatDate(setlist.eventDate, this.props.appState.orgStartNo, this.props.appState.orgEndNo)} | {cityAndCountry} | {setlist.venue.name}</Card.Title>
-                        <Card.Subtitle>{setlist.artist.name}</Card.Subtitle>
+                        <Card.Title>{cityAndCountry} | {setlist.venue.name}</Card.Title>
+                        <Card.Subtitle>{Pulse.adjustAndFormatDate(setlist.eventDate, this.props.appState.orgStartNo, this.props.appState.orgEndNo)} | {setlist.artist.name}</Card.Subtitle>
                         <Card.Text>
                             {setlistInfo}
                         </Card.Text>
-                        <Card.Link href="{setlist.url}">{cityAndCountry}</Card.Link>
+                        {/* <Card.Link href="{setlist.url}">{cityAndCountry}</Card.Link> */}
                         {/* <Button variant="primary" onClick={this.props.zoomTo} objectId={setlist.OBJECTID}>Zoom</Button> */}
                     </Card.Body>
                 </Card>

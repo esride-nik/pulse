@@ -78,50 +78,58 @@ export class SetlistFmComponent extends React.Component<{
         if (this.props.appState.config.setlistFmConnector.demoMode) {
             url = this.props.appState.config.setlistFmConnector.demoUrl;
         }
-        axios.get(url, options).then((response: any) => {
+
+        let promises = [];
+        for (let p=1; p<=this.props.appState.config.setlistFmConnector.defaultNumberOfPages; p++) {
+            promises.push(axios.get(url + "&page="+p, options));
+        }
+
+        Promise.all(promises).then((responses: any) => {
+            let graphics: Graphic[] = [];
             this.props.appState.setlists = [];
-            if (response.data && response.data.setlist) {
-                let graphics: Graphic[] = [];
-                response.data.setlist.map((setlist: any) => {
-                    let venueLocation: Point;
-                    if (setlist.venue && setlist.venue.city && setlist.venue.city.coords) {
-                        venueLocation = new Point({
-                            x: setlist.venue.city.coords.long,
-                            y: setlist.venue.city.coords.lat,
-                            spatialReference: {
-                                wkid: 4326
-                            }
+            responses.map((response: any) => {
+                if (response.data && response.data.setlist) {
+                    response.data.setlist.map((setlist: any) => {
+                        let venueLocation: Point;
+                        if (setlist.venue && setlist.venue.city && setlist.venue.city.coords) {
+                            venueLocation = new Point({
+                                x: setlist.venue.city.coords.long,
+                                y: setlist.venue.city.coords.lat,
+                                spatialReference: {
+                                    wkid: 4326
+                                }
+                            });
+                        }
+    
+                        let attInfo = setlist.info ? setlist.info : "";
+                        let eventDate = Date.parse(this.reformatSetlistFmDate(setlist.eventDate));
+                        let attributes = {
+                            "url": setlist.url,
+                            "OBJECTID": objectId,
+                            "eventDate": eventDate,
+                            "id": setlist.id,
+                            "info": attInfo,
+                        };
+                        this.props.appState.setlists.push({
+                            "OBJECTID": objectId,
+                            "id": setlist.id,
+                            "eventDate": eventDate,
+                            "info": attInfo,
+                            "artist": setlist.artist,
+                            "sets": setlist.sets,
+                            "url": setlist.url,
+                            "venue": setlist.venue
                         });
-                    }
-
-                    let attInfo = setlist.info ? setlist.info : "";
-                    let eventDate = Date.parse(this.reformatSetlistFmDate(setlist.eventDate));
-                    let attributes = {
-                        "url": setlist.url,
-                        "OBJECTID": objectId,
-                        "eventDate": eventDate,
-                        "id": setlist.id,
-                        "info": attInfo,
-                    };
-                    this.props.appState.setlists.push({
-                        "OBJECTID": objectId,
-                        "id": setlist.id,
-                        "eventDate": eventDate,
-                        "info": attInfo,
-                        "artist": setlist.artist,
-                        "sets": setlist.sets,
-                        "url": setlist.url,
-                        "venue": setlist.venue
+    
+                        graphics.push(new Graphic({
+                            attributes: attributes,
+                            geometry: venueLocation
+                        }));
+                        objectId++;
                     });
-
-                    graphics.push(new Graphic({
-                        attributes: attributes,
-                        geometry: venueLocation
-                    }));
-                    objectId++;
-                });
-                this.venueGraphicsToFeatureLayer(graphics);
-            }
+                }
+            });
+            this.venueGraphicsToFeatureLayer(graphics);
         });
     }
 
