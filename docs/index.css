@@ -21,7 +21,7 @@
 
 
 .setlistDetails {
-  overflow-y: scroll;
+  overflow: hidden;
   margin-top: 5px;
   max-height: 80vh;
 }
