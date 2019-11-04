@@ -35,8 +35,8 @@ export class SetlistFmComponent extends React.Component<{
     }
 
     componentDidMount() {
-        // ToDo: get recent artists from setlist.fm and randomly select one as default value?
-        this.artist.current.value = "Black Peaks";
+        let randomArtists = this.props.appState.config.setlistFmConnector.randomArtists;
+        this.artist.current.value = randomArtists[Math.floor((Math.random() * randomArtists.length))];
         this.artist.current.focus();
     }
 
