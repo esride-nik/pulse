@@ -13,7 +13,6 @@ import { Point, Extent, Geometry } from 'esri/geometry';
 import Collection from 'esri/core/Collection';
 import FeatureLayer from 'esri/layers/FeatureLayer';
 import { Pulse } from './Pulse';
-import { array } from 'prop-types';
 import TimeExtent from 'esri/TimeExtent';
 
 const venueFeaturesLayerId = "venueFeatures";

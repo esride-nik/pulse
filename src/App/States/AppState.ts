@@ -1,8 +1,7 @@
 import { observable, computed } from 'mobx'
-import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
-import Graphic from 'esri/Graphic';
 import FeatureLayer from 'esri/layers/FeatureLayer';
+import SceneView from 'esri/views/SceneView';
 
 export class AppState {
 
@@ -26,7 +25,7 @@ export class AppState {
     public map: Map;
 
     @observable
-    public mapView: MapView;
+    public view: SceneView;
 
     @observable
     public displayNow: string;

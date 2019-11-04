@@ -1,12 +1,9 @@
 import { observer, inject } from 'mobx-react';
 import { AppState } from '../States/AppState';
 import React from 'react';
-import MapView from 'esri/views/MapView';
 import Map from 'esri/Map';
 import './MapComponent.scss';
-import Graphic from 'esri/Graphic';
-import { Extent, Point, Geometry } from 'esri/geometry';
-import FeatureLayer from 'esri/layers/FeatureLayer';
+import SceneView from 'esri/views/SceneView';
 
 @inject('appState')
 @observer
@@ -15,7 +12,7 @@ export class MapComponent extends React.Component<{
 }> {
     private mapNode = React.createRef<HTMLDivElement>()
 
-    private mapView: MapView;
+    private view: SceneView;
     private map: Map;
 
     public componentDidMount() {
@@ -23,7 +20,7 @@ export class MapComponent extends React.Component<{
             basemap: "dark-gray-vector"
         })
 
-        this.mapView = new MapView({
+        this.view = new SceneView({
             container: this.mapNode.current,
             map: this.map,
             zoom: 3,
@@ -31,7 +28,7 @@ export class MapComponent extends React.Component<{
         });
 
         this.props.appState.map = this.map;
-        this.props.appState.mapView = this.mapView;
+        this.props.appState.view = this.view;
     }
 
     public render() {

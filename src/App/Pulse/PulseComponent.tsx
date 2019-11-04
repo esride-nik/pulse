@@ -16,12 +16,11 @@ import { Knob } from 'react-rotary-knob';
 import { SetlistDetailsComponent } from './SetlistDetailsComponent';
 import Graphic from 'esri/Graphic';
 import GraphicsLayer from 'esri/layers/GraphicsLayer';
-import Geometry from 'esri/geometry/Geometry';
 import Polyline from 'esri/geometry/Polyline';
 import geometryEngineAsync from 'esri/geometry/geometryEngineAsync';
 import TimeSlider from 'esri/widgets/TimeSlider';
-import TimeExtent from 'esri/TimeExtent';
 import TimeInterval from 'esri/TimeInterval';
+import SceneView from 'esri/views/SceneView';
 
 const venueFeaturesLayerId = "venueFeatures";
 
@@ -34,7 +33,7 @@ interface PulseComponentProps {
 @observer
 export class PulseComponent extends React.Component<PulseComponentProps> {
     private map: Map;
-    private mapView: __esri.MapView;
+    private view: SceneView;
 
     private selection: React.RefObject<unknown>;
     private flUrl: React.RefObject<unknown>;
@@ -70,7 +69,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     public componentDidMount() {
         this.map = this.props.appState.map;
-        this.mapView = this.props.appState.mapView;
+        this.view = this.props.appState.view;
         this.initPulse();
 
         this.mapLongLatZoom = this.props.appState.config.defaultMapLongLatZoom;
@@ -107,21 +106,21 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         });
         this.map.add(this.connectionsLayer);
 
-        this.mapView.when(() => {
-            this.mapView.watch("stationary", this.updateMapLongLat);
+        this.view.when(() => {
+            this.view.watch("stationary", this.updateMapLongLat);
 
             var pt = new Point({
                 longitude: this.mapLongLatZoom[0],
                 latitude: this.mapLongLatZoom[1]
             });
 
-            this.mapView.goTo({
+            this.view.goTo({
                 target: pt,
                 zoom: this.mapLongLatZoom[2]
             })
 
             this.timeSlider = new TimeSlider({
-                view: this.mapView,
+                view: this.view,
                 stops: {
                     interval: new TimeInterval({
                         "unit": "days",
@@ -130,7 +129,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                 },
                 mode: "cumulative-from-start"
             });
-            this.mapView.ui.add(this.timeSlider, "bottom-right");
+            this.view.ui.add(this.timeSlider, "bottom-right");
         })
     }
 
@@ -289,7 +288,7 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
         this.animationTime = 100-this.animationSpeed.current.value;
         this.map.remove(this.map.findLayerById(venueFeaturesLayerId));
         this.map.add(this.props.appState.pulseFeatureLayer);
-        this.mapView.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
+        this.view.goTo(this.props.appState.pulseFeatureLayer.fullExtent);
         this.props.appState.pulseSourceLoaded = true;
         this.props.appState.pulseFeatureLayerSymbol = Pulse.symbolSwitcher(featureLayer.geometryType);
         this.setRenderer(this.props.appState.startNo);
@@ -304,10 +303,10 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
 
     private updateExtent(newExtent: Extent) {
         if (newExtent.spatialReference.wkid === 102100) {
-            this.mapView.extent = newExtent
+            this.view.extent = newExtent
         }
         if (newExtent.spatialReference.wkid != 102100) {
-            this.mapView.extent = {
+            this.view.extent = {
                 xmax: 20026375.71466102,
                 xmin: -20026375.71466102,
                 ymax: 9349764.174146919,
@@ -490,8 +489,9 @@ export class PulseComponent extends React.Component<PulseComponentProps> {
                         if (this.props.appState.automaticZoom) {
                             // buffer does not work with polyline!
                             geometryEngineAsync.geodesicBuffer(setlistPoints, 100, "kilometers", true).then((setlistPathsGraphicBuffer: any) => {
-                                this.mapView.goTo({
-                                    target: setlistPathsGraphicBuffer
+                                this.view.goTo({
+                                    target: setlistPathsGraphicBuffer,
+                                    heading: 0
                                 });
                             });
                         }
